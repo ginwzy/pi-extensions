@@ -1,5 +1,6 @@
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
+import { pill } from "./pill.js";
 import type {
   BashToolDetails,
   EditToolDetails,
@@ -95,6 +96,7 @@ interface RenderTheme {
   fg(color: string, text: string): string;
   bg?(color: string, text: string): string;
   bold(text: string): string;
+  inverse(text: string): string;
   getBgAnsi?(color: string): string;
 }
 
@@ -1169,7 +1171,7 @@ function formatMcpCallLine(
         : toolLabel;
 
   return new Text(
-    `${theme.fg("toolTitle", theme.bold("MCP"))} ${theme.fg("accent", target)}${argSuffix}`,
+    `${pill("mcp", theme)} ${theme.fg("accent", target)}${argSuffix}`,
     0,
     0,
   );
@@ -1260,7 +1262,7 @@ function formatGenericToolCallLine(
   const argCount = Object.keys(argRecord).length;
   const argSuffix = formatArgCountSuffix(argCount, theme);
   return new Text(
-    `${theme.fg("toolTitle", theme.bold(toolName))}${argSuffix}`,
+    `${pill(toolName, theme)}${argSuffix}`,
     0,
     0,
   );
@@ -1277,7 +1279,7 @@ function formatSearchCallLine(
   theme: RenderTheme,
 ): Text {
   return new Text(
-    `${theme.fg("toolTitle", theme.bold(toolName))} ${theme.fg("accent", accent)}${theme.fg("muted", mutedSuffix)}`,
+    `${pill(toolName, theme)} ${theme.fg("accent", accent)}${theme.fg("muted", mutedSuffix)}`,
     0,
     0,
   );
@@ -1338,7 +1340,7 @@ function renderReadDisplayCall(
     const to = limit !== undefined ? from + limit - 1 : undefined;
     suffix = to ? `:${from}-${to}` : `:${from}`;
   }
-  const line = `${theme.fg("toolTitle", theme.bold("read"))} ${theme.fg("accent", path || "...")}${theme.fg("warning", suffix)}`;
+  const line = `${pill("read", theme)} ${theme.fg("accent", path || "...")}${theme.fg("warning", suffix)}`;
   return textResult(line);
 }
 
@@ -1392,7 +1394,7 @@ function renderEditDisplayCall(
  ): Text | Container {
   const path = shortenPath(getAdapterPath(args, adapter));
   const lineCount = adapter.getEditLineCount?.(args) ?? getEditLineCount(args);
-  const summaryText = `${theme.fg("toolTitle", theme.bold("edit"))} ${theme.fg("accent", path || "...")}${formatLineCountSuffix(lineCount, theme)}`;
+  const summaryText = `${pill("edit", theme)} ${theme.fg("accent", path || "...")}${formatLineCountSuffix(lineCount, theme)}`;
   if (!context?.argsComplete || !context.isPartial) {
     return textResult(summaryText);
   }
@@ -1785,7 +1787,7 @@ export function registerToolDisplayOverrides(
       })
         ? formatWriteCallSuffix(lineCount, sizeBytes, theme)
         : "";
-      const summaryText = `${theme.fg("toolTitle", theme.bold("write"))} ${theme.fg("accent", path || "...")}${suffix}`;
+      const summaryText = `${pill("write", theme)} ${theme.fg("accent", path || "...")}${suffix}`;
       if (!context.argsComplete || !context.isPartial) {
         return textResult(summaryText);
       }

@@ -1,5 +1,6 @@
 import { Text } from "@earendil-works/pi-tui";
 import { registerCleanup, registerTimer } from "./disposable.js";
+import { pill } from "./pill.js";
 
 const BASH_SPINNER_FRAMES = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"] as const;
 const BASH_SPINNER_INTERVAL_MS = 200;
@@ -16,6 +17,7 @@ interface BashCallArgs {
 interface BashCallRenderTheme {
 	fg(color: string, text: string): string;
 	bold(text: string): string;
+	inverse(text: string): string;
 }
 
 interface BashSpinnerState {
@@ -158,7 +160,7 @@ function buildBashCallText(
 			? theme.fg("muted", ` · ${formatElapsed(elapsedMs)}`)
 			: "";
 
-	return `${spinnerPrefix}${theme.fg("toolTitle", theme.bold("$"))} ${theme.fg("accent", commandDisplay)}${shellSuffix}${timeoutSuffix}${elapsedSuffix}`;
+	return `${spinnerPrefix}${pill("bash", theme)} ${theme.fg("accent", commandDisplay)}${shellSuffix}${timeoutSuffix}${elapsedSuffix}`;
 }
 
 export function renderBashCall(
