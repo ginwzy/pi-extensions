@@ -7,3 +7,6 @@
 [submodule "pi-nano-context"]
 	path = pi-nano-context
 	url = git@github.com:ginwzy/nano-context.git
+[submodule "pi-observational-memory"]
+	path = pi-observational-memory
+	url = git@github.com:ginwzy/pi-observational-memory.git
