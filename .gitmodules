@@ -1,0 +1,3 @@
+[submodule "pi-rtk-optimizer"]
+	path = pi-rtk-optimizer
+	url = git@github.com:ginwzy/pi-rtk-optimizer.git
