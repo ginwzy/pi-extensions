@@ -16,3 +16,7 @@
 [submodule "pi-subagents"]
 	path = pi-subagents
 	url = git@github.com:ginwzy/pi-subagents.git
+[submodule "ff-labs-pi-fff"]
+	path = ff-labs-pi-fff
+	url = git@github.com:ginwzy/fff.git
+	ignore = dirty
