@@ -1,3 +1,6 @@
 [submodule "pi-rtk-optimizer"]
 	path = pi-rtk-optimizer
 	url = git@github.com:ginwzy/pi-rtk-optimizer.git
+[submodule "pi-mcp-adapter"]
+	path = pi-mcp-adapter
+	url = git@github.com:ginwzy/pi-mcp-adapter.git
