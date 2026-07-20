@@ -13,3 +13,6 @@
 [submodule "pi-tool-display"]
 	path = pi-tool-display
 	url = git@github.com:ginwzy/pi-tool-display.git
+[submodule "pi-subagents"]
+	path = pi-subagents
+	url = git@github.com:ginwzy/pi-subagents.git
