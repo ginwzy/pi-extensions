@@ -11,10 +11,10 @@ const TOOL_ROLES: Record<string, string> = {
   read: "success",
   find: "mdCode",
   grep: "mdCode",
-  bash: "error",
+  bash: "warning",
   write: "accent",
   create: "accent",
-  edit: "warning",
+  edit: "accent",
   mcp: "mdCode",
 };
 
