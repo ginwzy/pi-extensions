@@ -24,7 +24,7 @@ and only check out the relevant package directory.
 | `pi-rewind` | `pi-rewind` | `arpagon/pi-rewind` | `ginwzy/pi-rewind` | enabled |
 | `pi-glance` | `pi-glance` | `LinYS77/pi-glance` | `ginwzy/pi-glance` | enabled |
 | `pi-context-core` | `pi-context-core` | `k0valik/pi-blackhole`, `daynin/nano-context` | `ginwzy/pi-context-core` | enabled |
-| `pi-rtk-optimizer` | `pi-rtk-optimizer` | `MasuRii/pi-rtk-optimizer` | `ginwzy/pi-rtk-optimizer` | reference |
+| `pi-rtk-optimizer` | `pi-rtk-optimizer` | `MasuRii/pi-rtk-optimizer` | `ginwzy/pi-rtk-optimizer` | enabled |
 | `pi-nano-context` | `pi-nano-context` | `daynin/nano-context` | `ginwzy/nano-context` | reference |
 | `pi-observational-memory` | `pi-observational-memory` | `elpapi42/pi-observational-memory` | `ginwzy/pi-observational-memory` | reference |
 

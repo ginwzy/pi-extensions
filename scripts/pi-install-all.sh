@@ -7,6 +7,7 @@ root="$(pwd)"
 settings="${PI_SETTINGS_FILE:-$HOME/.pi/agent/settings.json}"
 
 packages=(
+  "pi-rtk-optimizer|pi-rtk-optimizer"
   "pi-subagents|pi-subagents"
   "pi-mcp-adapter|pi-mcp-adapter"
   "@ff-labs/pi-fff|ff-labs-pi-fff/packages/pi-fff"
@@ -45,6 +46,7 @@ const root = process.env.PI_LOCAL_ROOT;
 const settingsPath = process.env.PI_SETTINGS_FILE;
 const settingsDir = path.dirname(settingsPath);
 const packagePaths = new Map([
+  ["pi-rtk-optimizer", "pi-rtk-optimizer"],
   ["pi-subagents", "pi-subagents"],
   ["pi-mcp-adapter", "pi-mcp-adapter"],
   ["@ff-labs/pi-fff", "ff-labs-pi-fff/packages/pi-fff"],

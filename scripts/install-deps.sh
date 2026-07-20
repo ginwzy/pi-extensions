@@ -21,6 +21,7 @@ npm_install() {
 
 # Standalone packages currently enabled in Pi.
 for dir in \
+  pi-rtk-optimizer \
   pi-mcp-adapter \
   pi-subagents \
   pi-tool-display \
