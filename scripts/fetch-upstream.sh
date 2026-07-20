@@ -5,9 +5,12 @@ cd "$(dirname "$0")/.."
 
 git submodule foreach --quiet '
   echo "--- $name ---"
-  if git remote get-url upstream >/dev/null 2>&1; then
-    git fetch upstream --prune --tags
-  else
+  remotes="$(git remote | grep "^upstream" || true)"
+  if [ -z "$remotes" ]; then
     echo "  no upstream remote"
+  else
+    for remote in $remotes; do
+      git fetch "$remote" --prune --tags
+    done
   fi
 '
