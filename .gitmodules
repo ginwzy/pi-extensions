@@ -24,3 +24,7 @@
 	path = juicesharp-rpiv-ask-user-question
 	url = git@github.com:ginwzy/rpiv-mono.git
 	ignore = dirty
+[submodule "pi-simplify"]
+	path = pi-simplify
+	url = git@github.com:ginwzy/pi-extensions-1.git
+	ignore = dirty
