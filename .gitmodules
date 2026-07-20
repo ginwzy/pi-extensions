@@ -16,7 +16,3 @@
 [submodule "pi-subagents"]
 	path = pi-subagents
 	url = git@github.com:ginwzy/pi-subagents.git
-[submodule "pi-tool-pills"]
-	path = pi-tool-pills
-	url = git@github.com:ginwzy/pi-my-rifle-ext.git
-	ignore = dirty
