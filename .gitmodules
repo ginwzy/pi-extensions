@@ -4,6 +4,7 @@
 [submodule "pi-mcp-adapter"]
 	path = pi-mcp-adapter
 	url = git@github.com:ginwzy/pi-mcp-adapter.git
+	ignore = dirty
 [submodule "pi-nano-context"]
 	path = pi-nano-context
 	url = git@github.com:ginwzy/nano-context.git
