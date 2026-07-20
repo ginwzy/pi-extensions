@@ -10,3 +10,6 @@
 [submodule "pi-observational-memory"]
 	path = pi-observational-memory
 	url = git@github.com:ginwzy/pi-observational-memory.git
+[submodule "pi-tool-display"]
+	path = pi-tool-display
+	url = git@github.com:ginwzy/pi-tool-display.git
