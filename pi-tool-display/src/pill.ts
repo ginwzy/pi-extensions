@@ -24,8 +24,13 @@ interface PillTheme {
   inverse(text: string): string;
 }
 
-/** Render an inverted-colour pill badge: ` name ` */
+/** Powerline round cap glyphs (require Nerd Font). */
+const LEFT_CAP = "\uE0B6"; // 
+const RIGHT_CAP = "\uE0B4"; // 
+
+/** Render a rounded pill badge:  name  */
 export function pill(name: string, theme: PillTheme): string {
   const role = TOOL_ROLES[name] ?? "dim";
-  return theme.bold(theme.inverse(theme.fg(role, ` ${name} `)));
+  const body = theme.bold(theme.inverse(theme.fg(role, ` ${name} `)));
+  return `${theme.fg(role, LEFT_CAP)}${body}${theme.fg(role, RIGHT_CAP)}`;
 }
