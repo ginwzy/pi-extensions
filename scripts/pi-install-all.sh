@@ -20,6 +20,7 @@ packages=(
   "pi-glance|pi-glance"
   "@juicesharp/rpiv-todo|juicesharp-rpiv-ask-user-question/packages/rpiv-todo"
   "pi-context-core|pi-context-core"
+  "pi-hashline-edit-pro|pi-hashline-edit-pro"
 )
 
 for spec in "${packages[@]}"; do
@@ -59,6 +60,7 @@ const packagePaths = new Map([
   ["pi-glance", "pi-glance"],
   ["@juicesharp/rpiv-todo", "juicesharp-rpiv-ask-user-question/packages/rpiv-todo"],
   ["pi-context-core", "pi-context-core"],
+  ["pi-hashline-edit-pro", "pi-hashline-edit-pro"],
 ]);
 
 const localSources = new Map(

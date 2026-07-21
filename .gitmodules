@@ -46,3 +46,6 @@
 	path = pi-context-core
 	url = https://github.com/ginwzy/pi-context-core.git
 	branch = feat/integrated-context-ui
+[submodule "pi-hashline-edit-pro"]
+	path = pi-hashline-edit-pro
+	url = https://github.com/ginwzy/pi-hashline-edit-pro.git

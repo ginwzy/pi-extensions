@@ -21,14 +21,15 @@ npm_install() {
 
 # Standalone packages currently enabled in Pi.
 for dir in \
-  pi-rtk-optimizer \
   pi-mcp-adapter \
   pi-subagents \
   pi-tool-display \
   pi-markdown-preview \
   pi-btw \
   pi-rewind \
-  pi-glance
+  pi-glance \
+  pi-crg \
+  pi-hashline-edit-pro
 do
   npm_install "$dir"
 done

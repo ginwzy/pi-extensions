@@ -36,3 +36,4 @@ set_remote pi-rewind upstream https://github.com/arpagon/pi-rewind.git
 set_remote pi-glance upstream https://github.com/LinYS77/pi-glance.git
 set_remote pi-context-core upstream-blackhole https://github.com/k0valik/pi-blackhole.git
 set_remote pi-context-core upstream-nano https://github.com/daynin/nano-context.git
+set_remote pi-hashline-edit-pro upstream https://github.com/YuGiMob/pi-hashline-edit-pro.git
