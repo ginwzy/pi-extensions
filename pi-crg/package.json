@@ -1,0 +1,38 @@
+{
+  "name": "pi-crg",
+  "version": "0.1.0",
+  "description": "Pi extension for code-review-graph: knowledge graph commands, auto-build hooks, and status widget",
+  "type": "module",
+  "license": "MIT",
+  "keywords": [
+    "pi-package",
+    "pi-extension",
+    "pi-coding-agent",
+    "code-review-graph",
+    "knowledge-graph",
+    "tree-sitter"
+  ],
+  "files": [
+    "src/",
+    "README.md",
+    "LICENSE"
+  ],
+  "pi": {
+    "extensions": [
+      "./src/index.ts"
+    ]
+  },
+  "peerDependencies": {
+    "@earendil-works/pi-coding-agent": ">=0.74.0 <1",
+    "@earendil-works/pi-tui": ">=0.74.0 <1"
+  },
+  "devDependencies": {
+    "@earendil-works/pi-coding-agent": "*",
+    "@earendil-works/pi-tui": "*",
+    "@types/node": "*",
+    "typescript": "*"
+  },
+  "scripts": {
+    "check": "tsc --noEmit"
+  }
+}
