@@ -118,6 +118,7 @@ async function handleReview(pi: ExtensionAPI, ctx: ExtensionCommandContext, stat
       display: true,
       details: { command: "review", isError: false },
     });
+    updateWidget(state, ctx);
   } else {
     state.lastError = shortError(result.stderr || result.stdout);
     updateWidget(state, ctx);
@@ -144,5 +145,6 @@ async function handleWatch(ctx: ExtensionCommandContext, state: CrgState): Promi
     ctx.ui.notify("No graph found. Run /crg build first.", "warning");
     return;
   }
+  updateWidget(state, ctx);
   ctx.ui.notify("Run: code-review-graph watch & (or: code-review-graph daemon start)", "info");
 }

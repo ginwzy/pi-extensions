@@ -13,7 +13,8 @@
  *   turn_end      — auto-update graph if enabled and files changed
  *
  * Config (via env):
- *   PI_CRG_AUTO_UPDATE=1  — enable auto-update on turn_end (default: off)
+ *   PI_CRG_AUTO_UPDATE=1        — enable auto-update on turn_end (default: off)
+ *   PI_CRG_WIDGET=activity      — activity | always | off (default: activity)
  */
 
 import type {
@@ -29,13 +30,14 @@ import { getCrgStatus, getWorkspaceFingerprint, runCrg } from "./cli.js";
 import { registerCommands } from "./commands.js";
 import { ensureCrgMcpRegistration } from "./mcp-registration.js";
 import { registerCrgMessageRenderer } from "./renderer.js";
-import { createInitialState, updateWidget, clearWidget, type CrgState } from "./widget.js";
+import { createInitialState, resolveWidgetMode, updateWidget, clearWidget, type CrgState } from "./widget.js";
 
 export default function (pi: ExtensionAPI) {
   const state: CrgState = createInitialState();
   const mcpRegistration = ensureCrgMcpRegistration();
   let autoUpdate = process.env.PI_CRG_AUTO_UPDATE === "1";
   let sessionCwd: string | null = null;
+  let missingGraphNotified = false;
 
   registerCrgMessageRenderer(pi);
   registerCommands(pi, state);
@@ -66,6 +68,7 @@ export default function (pi: ExtensionAPI) {
   pi.on("session_start", async (_event: SessionStartEvent, ctx: ExtensionContext) => {
     sessionCwd = ctx.cwd;
     autoUpdate = process.env.PI_CRG_AUTO_UPDATE === "1";
+    state.widgetMode = resolveWidgetMode();
     if (mcpRegistration.status === "registered" && ctx.hasUI) {
       ctx.ui.notify("Registered code-review-graph MCP server", "info");
     } else if (mcpRegistration.status === "error" && ctx.hasUI) {
@@ -85,7 +88,13 @@ export default function (pi: ExtensionAPI) {
       state.lastBuild = null;
       state.lastError = result.error;
     }
-    if (ctx.hasUI) updateWidget(state, ctx);
+    if (ctx.hasUI) {
+      updateWidget(state, ctx);
+      if (!state.graphReady && !state.lastError && state.widgetMode === "activity" && !missingGraphNotified) {
+        missingGraphNotified = true;
+        ctx.ui.notify("CRG graph is not built for this workspace. Run /crg build when needed.", "info");
+      }
+    }
   });
 
   // Update only when the workspace contents changed since the last successful check.

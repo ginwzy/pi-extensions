@@ -9,7 +9,7 @@ Pi extension for [code-review-graph](https://github.com/tirth8205/code-review-gr
 - `/crg review` — risk-scored change impact analysis
 - `/crg status` — graph statistics
 - `/crg watch` — watch mode instructions
-- Status widget showing graph state below the editor
+- Activity widget shown only while updating or when CRG needs attention
 - Auto-update on turn end (opt-in via `PI_CRG_AUTO_UPDATE=1`)
 - Automatic `code-review-graph` MCP server registration
 
@@ -39,6 +39,18 @@ Or from this monorepo:
 4. Use `/crg review` before code reviews for blast-radius analysis
 5. Set `PI_CRG_AUTO_UPDATE=1` to update the graph after turns that changed tracked or untracked files
 6. If CRG stores its database externally, set `PI_CRG_DATA_DIR=/path/to/data`
+
+## Widget Modes
+
+Set `PI_CRG_WIDGET` to control the status widget:
+
+| Value | Behavior |
+|---|---|
+| `activity` | Default. Show only while updating or when an error/stale graph needs attention. |
+| `always` | Always show no-graph, ready, updating, and error states. |
+| `off` | Never show the widget. `/crg status` notifications still work. |
+
+In the default mode, successful updates clear the widget automatically. Use `/crg status` whenever you need the current graph node count.
 
 ## MCP Integration
 

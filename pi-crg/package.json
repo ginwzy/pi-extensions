@@ -33,6 +33,7 @@
     "typescript": "*"
   },
   "scripts": {
-    "check": "tsc --noEmit"
+    "check": "tsc --noEmit",
+    "test": "node --experimental-strip-types test/widget.test.ts"
   }
 }
