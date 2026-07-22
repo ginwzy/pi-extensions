@@ -25,16 +25,19 @@ import type {
   TurnEndEvent,
   SessionShutdownEvent,
 } from "@earendil-works/pi-coding-agent";
-import { graphExists, runCrg } from "./cli.js";
+import { getCrgStatus, getWorkspaceFingerprint, runCrg } from "./cli.js";
 import { registerCommands } from "./commands.js";
+import { ensureCrgMcpRegistration } from "./mcp-registration.js";
+import { registerCrgMessageRenderer } from "./renderer.js";
 import { createInitialState, updateWidget, clearWidget, type CrgState } from "./widget.js";
 
 export default function (pi: ExtensionAPI) {
   const state: CrgState = createInitialState();
+  const mcpRegistration = ensureCrgMcpRegistration();
   let autoUpdate = process.env.PI_CRG_AUTO_UPDATE === "1";
   let sessionCwd: string | null = null;
 
-  // Register /crg commands
+  registerCrgMessageRenderer(pi);
   registerCommands(pi, state);
 
   // ─── before_agent_start: inject CRG context into system prompt ──────────
@@ -59,45 +62,52 @@ export default function (pi: ExtensionAPI) {
     return { systemPrompt: event.systemPrompt + crgContext };
   });
 
-  // ─── session_start: detect graph and show widget ───────────────────────
+  // Detect graph state through CRG so external data directories remain supported.
   pi.on("session_start", async (_event: SessionStartEvent, ctx: ExtensionContext) => {
     sessionCwd = ctx.cwd;
     autoUpdate = process.env.PI_CRG_AUTO_UPDATE === "1";
-
-    if (!graphExists(ctx.cwd)) {
-      state.graphReady = false;
-      if (ctx.hasUI) updateWidget(state, ctx);
-      return;
+    if (mcpRegistration.status === "registered" && ctx.hasUI) {
+      ctx.ui.notify("Registered code-review-graph MCP server", "info");
+    } else if (mcpRegistration.status === "error" && ctx.hasUI) {
+      ctx.ui.notify(`CRG MCP registration failed: ${mcpRegistration.error}`, "error");
     }
+    state.workspaceFingerprint = await getWorkspaceFingerprint(ctx.cwd);
 
-    // Graph exists — fetch status in background
-    state.graphReady = true;
-    if (ctx.hasUI) updateWidget(state, ctx);
-
-    const result = await runCrg(["status"], ctx.cwd, 10_000);
-    if (result.ok) {
-      const nodeMatch = result.stdout.match(/(\d[\d,]*)\s*(?:nodes|symbols)/i);
-      if (nodeMatch) state.nodeCount = parseInt(nodeMatch[1].replace(/,/g, ""), 10);
+    const result = await getCrgStatus(ctx.cwd);
+    if (result.status) {
+      state.graphReady = true;
+      state.nodeCount = result.status.nodes;
       state.lastBuild = "ready";
+      state.lastError = null;
+    } else {
+      state.graphReady = false;
+      state.nodeCount = null;
+      state.lastBuild = null;
+      state.lastError = result.error;
     }
     if (ctx.hasUI) updateWidget(state, ctx);
   });
 
-  // ─── turn_end: auto-update if enabled ──────────────────────────────────
+  // Update only when the workspace contents changed since the last successful check.
   pi.on("turn_end", async (_event: TurnEndEvent, ctx: ExtensionContext) => {
-    if (!autoUpdate || !sessionCwd || !state.graphReady) return;
-    if (state.updating) return;
+    if (!autoUpdate || !sessionCwd || !state.graphReady || state.updating) return;
+
+    const currentFingerprint = await getWorkspaceFingerprint(sessionCwd);
+    if (currentFingerprint === null || currentFingerprint === state.workspaceFingerprint) return;
 
     state.updating = true;
+    state.lastError = null;
     if (ctx.hasUI) updateWidget(state, ctx);
 
     const result = await runCrg(["update"], sessionCwd, 30_000);
-
     state.updating = false;
     if (result.ok) {
+      state.workspaceFingerprint = currentFingerprint;
       state.lastBuild = "just now";
-      const nodeMatch = result.stdout.match(/(\d[\d,]*)\s*(?:nodes|symbols)/i);
-      if (nodeMatch) state.nodeCount = parseInt(nodeMatch[1].replace(/,/g, ""), 10);
+      const status = await getCrgStatus(sessionCwd);
+      if (status.status) state.nodeCount = status.status.nodes;
+    } else {
+      state.lastError = (result.stderr || result.stdout || "update failed").replace(/\s+/g, " ").slice(0, 160);
     }
     if (ctx.hasUI) updateWidget(state, ctx);
   });
@@ -106,5 +116,6 @@ export default function (pi: ExtensionAPI) {
   pi.on("session_shutdown", (_event: SessionShutdownEvent, ctx: ExtensionContext) => {
     clearWidget(ctx);
     sessionCwd = null;
+    state.workspaceFingerprint = null;
   });
 }

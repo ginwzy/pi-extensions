@@ -11,6 +11,7 @@ Pi extension for [code-review-graph](https://github.com/tirth8205/code-review-gr
 - `/crg watch` — watch mode instructions
 - Status widget showing graph state below the editor
 - Auto-update on turn end (opt-in via `PI_CRG_AUTO_UPDATE=1`)
+- Automatic `code-review-graph` MCP server registration
 
 ## Prerequisites
 
@@ -36,20 +37,26 @@ Or from this monorepo:
 2. Run `/crg build` to parse the codebase
 3. The graph auto-detects on subsequent sessions
 4. Use `/crg review` before code reviews for blast-radius analysis
-5. Set `PI_CRG_AUTO_UPDATE=1` to keep the graph fresh automatically
+5. Set `PI_CRG_AUTO_UPDATE=1` to update the graph after turns that changed tracked or untracked files
+6. If CRG stores its database externally, set `PI_CRG_DATA_DIR=/path/to/data`
 
 ## MCP Integration
 
-For full tool access (28 query tools), also configure the MCP server:
+The extension automatically registers this server in Pi's global `mcp.json`:
 
 ```json
 {
-  "code-review-graph": {
-    "command": "uvx",
-    "args": ["code-review-graph", "serve"]
+  "mcpServers": {
+    "code-review-graph": {
+      "command": "uvx",
+      "args": ["code-review-graph", "serve"],
+      "lifecycle": "lazy"
+    }
   }
 }
 ```
+
+Existing registrations in standard global or project MCP configuration files are preserved. Set `PI_CRG_REGISTER_MCP=0` to disable automatic registration.
 
 This extension handles lifecycle (build/update/status); MCP handles queries.
 
