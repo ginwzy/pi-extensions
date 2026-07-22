@@ -98,9 +98,15 @@ computer with:
 ```
 
 The script refuses to overwrite local changes, fast-forwards the top-level
-repository, synchronizes submodule URLs, checks out the exact submodule commits
-recorded by this repository, and installs dependencies. Then run `/reload` or
-restart Pi.
+repository, synchronizes submodule URLs, and checks out the exact submodule
+commits recorded by this repository. Dependencies are installed only when the
+recorded top-level version changes. Then run `/reload` or restart Pi.
+
+To force dependency installation when the repository is already current:
+
+```bash
+./scripts/sync.sh --install
+```
 
 To update only the repositories and defer dependency installation:
 

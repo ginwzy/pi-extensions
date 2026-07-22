@@ -5,23 +5,28 @@ cd "$(dirname "$0")/.."
 
 usage() {
   cat <<'EOF'
-Usage: ./scripts/sync.sh [--skip-install]
+Usage: ./scripts/sync.sh [--install | --skip-install]
 
 Pull the top-level repository, check out its recorded submodule commits, and
-install dependencies. The script refuses to run when local changes are present.
+install dependencies when the recorded repository version changes. The script
+refuses to run when local changes are present.
 
 Options:
-  --skip-install  Update the repository and submodules without installing dependencies.
+  --install       Install dependencies even when the repository is unchanged.
+  --skip-install  Never install dependencies after updating.
   -h, --help      Show this help.
 EOF
 }
 
-skip_install=false
+install_mode=auto
 
 while [ "$#" -gt 0 ]; do
   case "$1" in
+    --install)
+      install_mode=always
+      ;;
     --skip-install)
-      skip_install=true
+      install_mode=never
       ;;
     -h|--help)
       usage
@@ -48,8 +53,11 @@ if [ -z "$branch" ]; then
   exit 1
 fi
 
+old_head="$(git rev-parse HEAD)"
+
 echo "== Pulling $branch =="
 git pull --ff-only
+new_head="$(git rev-parse HEAD)"
 
 echo
 echo "== Synchronizing submodule configuration =="
@@ -59,10 +67,20 @@ echo
 echo "== Checking out recorded submodule commits =="
 git submodule update --init --recursive
 
-if [ "$skip_install" = false ]; then
+should_install=false
+if [ "$install_mode" = always ]; then
+  should_install=true
+elif [ "$install_mode" = auto ] && [ "$old_head" != "$new_head" ]; then
+  should_install=true
+fi
+
+if [ "$should_install" = true ]; then
   echo
-echo "== Installing dependencies =="
+  echo "== Installing dependencies =="
   ./scripts/install-deps.sh
+else
+  echo
+  echo "== Dependencies unchanged; skipping installation (use --install to force) =="
 fi
 
 echo
