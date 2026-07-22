@@ -87,6 +87,27 @@ cd pi-subagents
 git log --oneline main..upstream/main
 ```
 
+## Syncing updates from another computer
+
+After pushing both the changed extension commits and the updated submodule
+pointers in this management repository, apply those versions on another
+computer with:
+
+```bash
+./scripts/sync.sh
+```
+
+The script refuses to overwrite local changes, fast-forwards the top-level
+repository, synchronizes submodule URLs, checks out the exact submodule commits
+recorded by this repository, and installs dependencies. Then run `/reload` or
+restart Pi.
+
+To update only the repositories and defer dependency installation:
+
+```bash
+./scripts/sync.sh --skip-install
+```
+
 ## Updating one extension
 
 For a normal submodule:
