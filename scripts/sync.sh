@@ -41,9 +41,22 @@ while [ "$#" -gt 0 ]; do
   shift
 done
 
-if [ -n "$(git status --porcelain --ignore-submodules=none)" ]; then
+top_level_changes="$(git status --porcelain --ignore-submodules=all)"
+if [ -n "$top_level_changes" ]; then
   echo "local changes detected; commit or stash them before syncing:" >&2
-  git status --short >&2
+  git status --short --ignore-submodules=all >&2
+  exit 1
+fi
+
+if ! git submodule foreach --quiet --recursive '
+  ignore_mode="$(git config --file "$toplevel/.gitmodules" --get "submodule.$name.ignore" || :)"
+  submodule_changes="$(git status --porcelain)"
+  if [ "$ignore_mode" != dirty ] && [ -n "$submodule_changes" ]; then
+    echo "local changes detected in submodule $displaypath:" >&2
+    git status --short >&2
+    exit 1
+  fi
+'; then
   exit 1
 fi
 
