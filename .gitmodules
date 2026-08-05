@@ -39,3 +39,8 @@
 [submodule "pi-hashline-edit-pro"]
 	path = pi-hashline-edit-pro
 	url = https://github.com/ginwzy/pi-hashline-edit-pro.git
+
+[submodule "upstream-references/pi-gpt-fast-mode"]
+	path = upstream-references/pi-gpt-fast-mode
+	url = https://github.com/tunnckoCore/pi-gpt-fast-mode.git
+	branch = main
