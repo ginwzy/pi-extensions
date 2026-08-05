@@ -26,7 +26,6 @@ for dir in \
   pi-tool-display \
   pi-btw \
   pi-rewind \
-  pi-glance \
   pi-hashline-edit-pro
 do
   npm_install "$dir"

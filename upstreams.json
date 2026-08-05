@@ -92,14 +92,6 @@
       "entrypoints": ["src/index.ts"]
     },
     {
-      "id": "pi-glance",
-      "path": "pi-glance",
-      "repository": "https://github.com/LinYS77/pi-glance.git",
-      "branch": "main",
-      "scopes": [],
-      "entrypoints": ["index.ts"]
-    },
-    {
       "id": "pi-hashline-edit-pro",
       "path": "pi-hashline-edit-pro",
       "repository": "https://github.com/YuGiMob/pi-hashline-edit-pro.git",

@@ -33,9 +33,6 @@
 [submodule "pi-rewind"]
 	path = pi-rewind
 	url = https://github.com/ginwzy/pi-rewind.git
-[submodule "pi-glance"]
-	path = pi-glance
-	url = https://github.com/ginwzy/pi-glance.git
 [submodule "pi-hashline-edit-pro"]
 	path = pi-hashline-edit-pro
 	url = https://github.com/ginwzy/pi-hashline-edit-pro.git

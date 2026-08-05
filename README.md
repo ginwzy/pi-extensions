@@ -26,7 +26,6 @@ and only check out the relevant package directory.
 | `pi-simplify` | `pi-simplify/packages/pi-simplify` | `MattDevy/pi-extensions` | `ginwzy/pi-extensions-1` | enabled |
 | `pi-btw` | `pi-btw` | `dbachelder/pi-btw` | `ginwzy/pi-btw` | enabled |
 | `pi-rewind` | `pi-rewind` | `arpagon/pi-rewind` | `ginwzy/pi-rewind` | enabled |
-| `pi-glance` | `pi-glance` | `LinYS77/pi-glance` | `ginwzy/pi-glance` | enabled |
 | `pi-hashline-edit-pro` | `pi-hashline-edit-pro` | `YuGiMob/pi-hashline-edit-pro` | `ginwzy/pi-hashline-edit-pro` | enabled |
 | `pi-rtk-optimizer` | `pi-rtk-optimizer` | `MasuRii/pi-rtk-optimizer` | `ginwzy/pi-rtk-optimizer` | enabled |
 | `pi-observational-memory` | `pi-observational-memory` | `elpapi42/pi-observational-memory` | `ginwzy/pi-observational-memory` | reference |

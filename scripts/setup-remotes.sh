@@ -31,5 +31,4 @@ set_remote juicesharp-rpiv-ask-user-question upstream https://github.com/juicesh
 set_remote pi-simplify upstream https://github.com/MattDevy/pi-extensions.git
 set_remote pi-btw upstream https://github.com/dbachelder/pi-btw.git
 set_remote pi-rewind upstream https://github.com/arpagon/pi-rewind.git
-set_remote pi-glance upstream https://github.com/LinYS77/pi-glance.git
 set_remote pi-hashline-edit-pro upstream https://github.com/YuGiMob/pi-hashline-edit-pro.git

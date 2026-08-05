@@ -17,7 +17,6 @@ packages=(
   "pi-tool-display|pi-tool-display"
   "pi-btw|pi-btw"
   "pi-rewind|pi-rewind"
-  "pi-glance|pi-glance"
   "@juicesharp/rpiv-todo|juicesharp-rpiv-ask-user-question/packages/rpiv-todo"
   "pi-hashline-edit-pro|pi-hashline-edit-pro"
 )
@@ -56,7 +55,6 @@ const packagePaths = new Map([
   ["pi-tool-display", "pi-tool-display"],
   ["pi-btw", "pi-btw"],
   ["pi-rewind", "pi-rewind"],
-  ["pi-glance", "pi-glance"],
   ["@juicesharp/rpiv-todo", "juicesharp-rpiv-ask-user-question/packages/rpiv-todo"],
   ["pi-hashline-edit-pro", "pi-hashline-edit-pro"],
 ]);
