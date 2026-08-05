@@ -24,11 +24,9 @@ for dir in \
   pi-mcp-adapter \
   pi-subagents \
   pi-tool-display \
-  pi-markdown-preview \
   pi-btw \
   pi-rewind \
   pi-glance \
-  pi-crg \
   pi-hashline-edit-pro
 do
   npm_install "$dir"
@@ -62,11 +60,3 @@ npm install \
 
 echo "npm run build in pi-simplify/packages/pi-simplify"
 npm run build --prefix pi-simplify/packages/pi-simplify
-
-if [ -f pi-context-core/pnpm-lock.yaml ]; then
-  package_manager="$(node -p "require('./pi-context-core/package.json').packageManager")"
-  echo "$package_manager install in pi-context-core"
-  corepack "$package_manager" --dir pi-context-core install --frozen-lockfile
-else
-  echo "skip pi-context-core (no pnpm-lock.yaml)" >&2
-fi

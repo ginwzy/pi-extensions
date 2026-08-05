@@ -5,9 +5,6 @@
 	path = pi-mcp-adapter
 	url = https://github.com/ginwzy/pi-mcp-adapter.git
 	ignore = dirty
-[submodule "pi-nano-context"]
-	path = pi-nano-context
-	url = https://github.com/ginwzy/nano-context.git
 [submodule "pi-observational-memory"]
 	path = pi-observational-memory
 	url = https://github.com/ginwzy/pi-observational-memory.git
@@ -30,9 +27,6 @@
 	path = pi-simplify
 	url = https://github.com/ginwzy/pi-extensions-1.git
 	ignore = dirty
-[submodule "pi-markdown-preview"]
-	path = pi-markdown-preview
-	url = https://github.com/ginwzy/pi-markdown-preview.git
 [submodule "pi-btw"]
 	path = pi-btw
 	url = https://github.com/ginwzy/pi-btw.git
@@ -42,10 +36,6 @@
 [submodule "pi-glance"]
 	path = pi-glance
 	url = https://github.com/ginwzy/pi-glance.git
-[submodule "pi-context-core"]
-	path = pi-context-core
-	url = https://github.com/ginwzy/pi-context-core.git
-	branch = feat/integrated-context-ui
 [submodule "pi-hashline-edit-pro"]
 	path = pi-hashline-edit-pro
 	url = https://github.com/ginwzy/pi-hashline-edit-pro.git
