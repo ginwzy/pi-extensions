@@ -5,16 +5,10 @@
 	path = pi-mcp-adapter
 	url = https://github.com/ginwzy/pi-mcp-adapter.git
 	ignore = dirty
-[submodule "pi-observational-memory"]
-	path = pi-observational-memory
-	url = https://github.com/ginwzy/pi-observational-memory.git
 [submodule "pi-tool-display"]
 	path = pi-tool-display
 	url = https://github.com/ginwzy/pi-tool-display.git
 	ignore = dirty
-[submodule "pi-subagents"]
-	path = pi-subagents
-	url = https://github.com/ginwzy/pi-subagents.git
 [submodule "ff-labs-pi-fff"]
 	path = ff-labs-pi-fff
 	url = https://github.com/ginwzy/fff.git
@@ -33,9 +27,6 @@
 [submodule "pi-rewind"]
 	path = pi-rewind
 	url = https://github.com/ginwzy/pi-rewind.git
-[submodule "pi-hashline-edit-pro"]
-	path = pi-hashline-edit-pro
-	url = https://github.com/ginwzy/pi-hashline-edit-pro.git
 
 [submodule "upstream-references/pi-gpt-fast-mode"]
 	path = upstream-references/pi-gpt-fast-mode

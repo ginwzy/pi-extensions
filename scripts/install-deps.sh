@@ -22,11 +22,9 @@ npm_install() {
 # Standalone packages currently enabled in Pi.
 for dir in \
   pi-mcp-adapter \
-  pi-subagents \
   pi-tool-display \
   pi-btw \
   pi-rewind \
-  pi-hashline-edit-pro
 do
   npm_install "$dir"
 done

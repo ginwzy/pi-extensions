@@ -9,7 +9,6 @@ settings="${PI_SETTINGS_FILE:-$HOME/.pi/agent/settings.json}"
 packages=(
   "@ginwzy/pi-extensions|."
   "pi-rtk-optimizer|pi-rtk-optimizer"
-  "pi-subagents|pi-subagents"
   "pi-mcp-adapter|pi-mcp-adapter"
   "@ff-labs/pi-fff|ff-labs-pi-fff/packages/pi-fff"
   "pi-simplify|pi-simplify/packages/pi-simplify"
@@ -18,7 +17,6 @@ packages=(
   "pi-btw|pi-btw"
   "pi-rewind|pi-rewind"
   "@juicesharp/rpiv-todo|juicesharp-rpiv-ask-user-question/packages/rpiv-todo"
-  "pi-hashline-edit-pro|pi-hashline-edit-pro"
 )
 
 for spec in "${packages[@]}"; do
@@ -47,7 +45,6 @@ const settingsDir = path.dirname(settingsPath);
 const packagePaths = new Map([
   ["@ginwzy/pi-extensions", "."],
   ["pi-rtk-optimizer", "pi-rtk-optimizer"],
-  ["pi-subagents", "pi-subagents"],
   ["pi-mcp-adapter", "pi-mcp-adapter"],
   ["@ff-labs/pi-fff", "ff-labs-pi-fff/packages/pi-fff"],
   ["pi-simplify", "pi-simplify/packages/pi-simplify"],
@@ -56,7 +53,6 @@ const packagePaths = new Map([
   ["pi-btw", "pi-btw"],
   ["pi-rewind", "pi-rewind"],
   ["@juicesharp/rpiv-todo", "juicesharp-rpiv-ask-user-question/packages/rpiv-todo"],
-  ["pi-hashline-edit-pro", "pi-hashline-edit-pro"],
 ]);
 
 const localSources = new Map(

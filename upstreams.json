@@ -28,27 +28,11 @@
       "entrypoints": ["index.ts"]
     },
     {
-      "id": "pi-observational-memory",
-      "path": "pi-observational-memory",
-      "repository": "https://github.com/elpapi42/pi-observational-memory.git",
-      "branch": "main",
-      "scopes": ["src", "package.json", "package-lock.json"],
-      "entrypoints": ["src/index.ts"]
-    },
-    {
       "id": "pi-tool-display",
       "path": "pi-tool-display",
       "repository": "https://github.com/MasuRii/pi-tool-display.git",
       "branch": "main",
       "scopes": ["src", "index.ts", "package.json", "package-lock.json"],
-      "entrypoints": ["index.ts"]
-    },
-    {
-      "id": "pi-subagents",
-      "path": "pi-subagents",
-      "repository": "https://github.com/nicobailon/pi-subagents.git",
-      "branch": "main",
-      "scopes": ["src", "index.ts", "agents", "skills", "prompts", "package.json", "package-lock.json"],
       "entrypoints": ["index.ts"]
     },
     {
@@ -90,14 +74,6 @@
       "branch": "main",
       "scopes": ["src", "package.json"],
       "entrypoints": ["src/index.ts"]
-    },
-    {
-      "id": "pi-hashline-edit-pro",
-      "path": "pi-hashline-edit-pro",
-      "repository": "https://github.com/YuGiMob/pi-hashline-edit-pro.git",
-      "branch": "main",
-      "scopes": ["src", "index.ts", "prompts", "package.json", "package-lock.json"],
-      "entrypoints": ["index.ts"]
     }
   ]
 }

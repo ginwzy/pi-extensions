@@ -19,16 +19,13 @@ and only check out the relevant package directory.
 |---|---|---|---|---|
 | `upstream-references/pi-gpt-fast-mode` | `src/modules/gpt-fast-mode` | `tunnckoCore/pi-gpt-fast-mode` | package-owned integration | enabled |
 | `pi-mcp-adapter` | `pi-mcp-adapter` | `nicobailon/pi-mcp-adapter` | `ginwzy/pi-mcp-adapter` | enabled |
-| `pi-subagents` | `pi-subagents` | `nicobailon/pi-subagents` | `ginwzy/pi-subagents` | enabled |
 | `pi-tool-display` | `pi-tool-display` | `MasuRii/pi-tool-display` | `ginwzy/pi-tool-display` | enabled |
 | `ff-labs-pi-fff` | `ff-labs-pi-fff/packages/pi-fff` | `dmtrKovalenko/fff` | `ginwzy/fff` | enabled |
 | `juicesharp-rpiv-ask-user-question` | `packages/rpiv-ask-user-question`, `packages/rpiv-todo` | `juicesharp/rpiv-mono` | `ginwzy/rpiv-mono` | enabled |
 | `pi-simplify` | `pi-simplify/packages/pi-simplify` | `MattDevy/pi-extensions` | `ginwzy/pi-extensions-1` | enabled |
 | `pi-btw` | `pi-btw` | `dbachelder/pi-btw` | `ginwzy/pi-btw` | enabled |
 | `pi-rewind` | `pi-rewind` | `arpagon/pi-rewind` | `ginwzy/pi-rewind` | enabled |
-| `pi-hashline-edit-pro` | `pi-hashline-edit-pro` | `YuGiMob/pi-hashline-edit-pro` | `ginwzy/pi-hashline-edit-pro` | enabled |
 | `pi-rtk-optimizer` | `pi-rtk-optimizer` | `MasuRii/pi-rtk-optimizer` | `ginwzy/pi-rtk-optimizer` | enabled |
-| `pi-observational-memory` | `pi-observational-memory` | `elpapi42/pi-observational-memory` | `ginwzy/pi-observational-memory` | reference |
 
 `pi-tool-display` contains custom commits for colored tool pills.
 
@@ -135,7 +132,7 @@ Run `./scripts/setup-remotes.sh` first after a fresh clone because Git submodule
 Then inspect a specific submodule:
 
 ```bash
-cd pi-subagents
+cd pi-tool-display
 git log --oneline main..upstream/main
 ```
 
@@ -171,7 +168,7 @@ To update only the repositories and defer dependency installation:
 For a normal submodule:
 
 ```bash
-cd pi-subagents
+cd pi-tool-display
 git fetch upstream
 git switch main
 git merge upstream/main
@@ -179,8 +176,8 @@ git merge upstream/main
 git push origin main
 
 cd ..
-git add pi-subagents
-git commit -m "chore: update pi-subagents"
+git add pi-tool-display
+git commit -m "chore: update pi-tool-display"
 ```
 
 For a sparse monorepo submodule, the workflow is the same, but the package lives
@@ -221,8 +218,7 @@ git commit -m "chore: update pi-tool-display pointer"
 
 - Sparse submodules have `ignore = dirty` configured because sparse-checkout
   makes unrelated upstream paths appear deleted in normal `git status`.
-- `pi-observational-memory` and `pi-rtk-optimizer` are reference-only and are
-  intentionally excluded from the default Pi config.
+- `pi-rtk-optimizer` is reference-only and is intentionally excluded from the default Pi config.
 - Migrated runtime source lives under `src/modules/`; upstream checkouts are review references rather than runtime dependencies.
 - The top-level repo records retained submodule commits, so updates are explicit and
   reviewable.
