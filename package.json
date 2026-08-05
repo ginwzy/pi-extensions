@@ -1,0 +1,48 @@
+{
+  "name": "@ginwzy/pi-extensions",
+  "version": "0.1.0",
+  "description": "All-in-One Pi extension package maintained in the ginwzy/pi-extensions repository.",
+  "type": "module",
+  "license": "UNLICENSED",
+  "keywords": [
+    "pi-package",
+    "pi-extension"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ginwzy/pi-extensions.git"
+  },
+  "files": [
+    "src",
+    "skills/upstream-review",
+    "README.md",
+    "THIRD_PARTY_NOTICES.md"
+  ],
+  "pi": {
+    "extensions": [
+      "./src/index.ts"
+    ],
+    "skills": [
+      "!skills/**"
+    ],
+    "prompts": [],
+    "themes": []
+  },
+  "scripts": {
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "check": "npm run typecheck && npm test"
+  },
+  "peerDependencies": {
+    "@earendil-works/pi-coding-agent": "*"
+  },
+  "devDependencies": {
+    "@earendil-works/pi-coding-agent": "^0.83.0",
+    "@types/node": "^24.10.0",
+    "typescript": "^5.9.3",
+    "vitest": "^3.2.4"
+  },
+  "engines": {
+    "node": ">=22.19.0"
+  }
+}
