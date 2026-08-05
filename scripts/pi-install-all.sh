@@ -66,17 +66,18 @@ const localSources = new Map(
 );
 const rootPackageName = "@ginwzy/pi-extensions";
 const standaloneGptFastModeName = "@tunnckocore/pi-gpt-fast-mode";
-const recognizedNpmNames = new Set([...localSources.keys(), standaloneGptFastModeName]);
+const removedPiRewindName = "@ayulab/pi-rewind";
+const recognizedNpmNames = new Set([...localSources.keys(), standaloneGptFastModeName, removedPiRewindName]);
 
 function sourceOf(entry) {
   return typeof entry === "string" ? entry : entry && typeof entry === "object" ? entry.source : undefined;
 }
 
 function npmPackageName(source) {
-  if (!source.startsWith("npm:")) return undefined;
+  if (typeof source !== "string" || !source.startsWith("npm:")) return undefined;
   for (const name of recognizedNpmNames) {
     const prefix = `npm:${name}`;
-    if (source === prefix || source.startsWith(`${prefix}@`)) return name;
+    if (source === prefix || (source.startsWith(`${prefix}@`) && source.length > prefix.length + 1)) return name;
   }
   return undefined;
 }
@@ -131,6 +132,9 @@ for (const entry of current) {
       next.push(migrateStandaloneGptEntry(entry, localSources.get(rootPackageName)));
       seen.add(rootPackageName);
     }
+    continue;
+  }
+  if (npmPackageName(sourceOf(entry)) === removedPiRewindName) {
     continue;
   }
   if (!localSources.has(name)) {
