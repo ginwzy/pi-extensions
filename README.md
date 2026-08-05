@@ -1,35 +1,65 @@
 # pi-extensions
 
-Personal workspace for managing [pi](https://pi.dev) extension packages.
+All-in-One [Pi](https://pi.dev) package and upstream-management workspace.
+The repository root is the package: `package.json` declares one Pi extension entry,
+and that entry hosts independently owned modules from `src/modules/`.
 
-This repository is a management repo. Each extension is tracked as a Git
-submodule pointing to a personal fork, so local customizations can be committed
-and upstream updates can be fetched, reviewed, and merged when needed.
+Runtime source is owned by this package. Retained Git checkouts are upstream references
+for review and provenance, not runtime dependencies; Pi's non-recursive Git package
+clone therefore does not need submodules to load the migrated modules. GPT Fast Mode
+is the first migrated module. The remaining extensions continue to run as separate
+packages until they reach parity in the All-in-One host.
 
-Some upstream projects are monorepos. Those submodules use Git sparse-checkout
+Some upstream projects are monorepos. Their reference checkouts use Git sparse-checkout
 and only check out the relevant package directory.
 
 ## Layout
 
-| Directory | Pi package path | Upstream | Fork | Default |
+| Directory | Runtime/integration path | Upstream | Fork | Default |
 |---|---|---|---|---|
+| `upstream-references/pi-gpt-fast-mode` | `src/modules/gpt-fast-mode` | `tunnckoCore/pi-gpt-fast-mode` | package-owned integration | enabled |
 | `pi-mcp-adapter` | `pi-mcp-adapter` | `nicobailon/pi-mcp-adapter` | `ginwzy/pi-mcp-adapter` | enabled |
 | `pi-subagents` | `pi-subagents` | `nicobailon/pi-subagents` | `ginwzy/pi-subagents` | enabled |
 | `pi-tool-display` | `pi-tool-display` | `MasuRii/pi-tool-display` | `ginwzy/pi-tool-display` | enabled |
 | `ff-labs-pi-fff` | `ff-labs-pi-fff/packages/pi-fff` | `dmtrKovalenko/fff` | `ginwzy/fff` | enabled |
 | `juicesharp-rpiv-ask-user-question` | `packages/rpiv-ask-user-question`, `packages/rpiv-todo` | `juicesharp/rpiv-mono` | `ginwzy/rpiv-mono` | enabled |
 | `pi-simplify` | `pi-simplify/packages/pi-simplify` | `MattDevy/pi-extensions` | `ginwzy/pi-extensions-1` | enabled |
-| `pi-markdown-preview` | `pi-markdown-preview` | `omaclaren/pi-markdown-preview` | `ginwzy/pi-markdown-preview` | enabled |
 | `pi-btw` | `pi-btw` | `dbachelder/pi-btw` | `ginwzy/pi-btw` | enabled |
 | `pi-rewind` | `pi-rewind` | `arpagon/pi-rewind` | `ginwzy/pi-rewind` | enabled |
 | `pi-glance` | `pi-glance` | `LinYS77/pi-glance` | `ginwzy/pi-glance` | enabled |
-| `pi-context-core` | `pi-context-core` | `k0valik/pi-blackhole`, `daynin/nano-context` | `ginwzy/pi-context-core` | enabled |
 | `pi-hashline-edit-pro` | `pi-hashline-edit-pro` | `YuGiMob/pi-hashline-edit-pro` | `ginwzy/pi-hashline-edit-pro` | enabled |
 | `pi-rtk-optimizer` | `pi-rtk-optimizer` | `MasuRii/pi-rtk-optimizer` | `ginwzy/pi-rtk-optimizer` | enabled |
-| `pi-nano-context` | `pi-nano-context` | `daynin/nano-context` | `ginwzy/nano-context` | reference |
 | `pi-observational-memory` | `pi-observational-memory` | `elpapi42/pi-observational-memory` | `ginwzy/pi-observational-memory` | reference |
 
-`pi-context-core` integrates nano-context and observational-memory behavior. Do not install the standalone `pi-nano-context` or `pi-observational-memory` packages alongside it. `pi-tool-display` contains custom commits for colored tool pills.
+`pi-tool-display` contains custom commits for colored tool pills.
+
+## All-in-One package
+
+The root manifest exposes exactly one extension, `src/index.ts`. The host registers
+modules in deterministic order, rejects cross-module registration collisions, isolates
+module-level API overrides, and cleans up shared event-bus subscriptions at shutdown.
+The first module, GPT Fast Mode, preserves its `/fast` command, shortcut, provider hook,
+and state event behavior.
+
+For a local package smoke test or a direct Git installation:
+
+```bash
+pi install /absolute/path/to/pi-extensions
+pi install git:github.com/ginwzy/pi-extensions
+```
+
+Do not enable the root package alongside the standalone
+`@tunnckocore/pi-gpt-fast-mode` package: both own `/fast`. The installer below replaces
+standalone GPT Fast Mode npm, Git, and local entries with the All-in-One root while
+keeping the other extensions standalone until they migrate.
+Persistent All-in-One module activation is intentionally deferred; the current slice
+loads GPT Fast Mode by default, while its existing Pi settings control the feature's
+initial on/off state.
+
+`skills/upstream-review` is included in the package files for project maintenance but
+is explicitly excluded by the negative `package.json#pi.skills` pattern. Package
+filters cannot re-enable a manifest-excluded skill. Only this repository's
+`.pi/settings.json` loads it, so installing the package elsewhere does not expose it.
 
 ## Initial setup
 
@@ -62,8 +92,7 @@ Replace the managed npm/package entries in Pi settings with local paths:
 ./scripts/pi-install-all.sh
 ```
 
-The configuration script validates every package, backs up `~/.pi/agent/settings.json`, preserves package order and filters, removes duplicate managed entries, and writes the enabled local package paths. Reference-only packages are not installed.
-
+The configuration script validates the root and every standalone package, backs up `~/.pi/agent/settings.json`, preserves package order and filters for existing managed packages, removes duplicate managed entries, replaces standalone GPT Fast Mode with the All-in-One root, and writes the remaining enabled local package paths. Reference-only packages are not installed.
 ## Daily workflow
 
 Check submodule status:
@@ -77,6 +106,30 @@ Fetch upstream updates without changing local branches:
 ```bash
 ./scripts/fetch-upstream.sh
 ```
+
+## AI-assisted upstream review
+
+The project-local `.pi/settings.json` explicitly loads the packaged `upstream-review`
+skill. It is available in this repository but is omitted from package resource
+discovery when the All-in-One package is installed in another project.
+
+Start a review with:
+
+```text
+/skill:upstream-review check all
+```
+
+The review phase may fetch and inspect upstream changes and write a report, but it
+is not authorized to modify extension code. The inspector enforces that its output
+stays below `.upstream-reviews/`. Select candidate IDs such as `U01` to authorize an
+isolated implementation. After the AI reports the implementation and observed
+verification results, merging requires a second explicit approval.
+
+Upstream sources are listed in `upstreams.json`. Empty scopes intentionally mean the
+whole reference repository. For migrated modules, `integratedCommit` is the latest
+commit from the declared upstream history incorporated into package-owned source;
+`localCommit` is only the current reference-checkout state. Generated snapshots and
+reports are written below `.upstream-reviews/` and are intentionally ignored by Git.
 
 Run `./scripts/setup-remotes.sh` first after a fresh clone because Git submodule remote configuration is local and is not stored in `.gitmodules`.
 
@@ -169,8 +222,9 @@ git commit -m "chore: update pi-tool-display pointer"
 
 - Sparse submodules have `ignore = dirty` configured because sparse-checkout
   makes unrelated upstream paths appear deleted in normal `git status`.
-- `pi-nano-context`, `pi-observational-memory`, and `pi-rtk-optimizer` are
-  reference-only and are intentionally excluded from the default Pi config.
-- The top-level repo records submodule commits, so updates are explicit and
+- `pi-observational-memory` and `pi-rtk-optimizer` are reference-only and are
+  intentionally excluded from the default Pi config.
+- Migrated runtime source lives under `src/modules/`; upstream checkouts are review references rather than runtime dependencies.
+- The top-level repo records retained submodule commits, so updates are explicit and
   reviewable.
 - Run `/reload` or restart Pi after changing extension code or package sources.

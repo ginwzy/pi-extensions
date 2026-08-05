@@ -7,6 +7,7 @@ root="$(pwd)"
 settings="${PI_SETTINGS_FILE:-$HOME/.pi/agent/settings.json}"
 
 packages=(
+  "@ginwzy/pi-extensions|."
   "pi-rtk-optimizer|pi-rtk-optimizer"
   "pi-subagents|pi-subagents"
   "pi-mcp-adapter|pi-mcp-adapter"
@@ -14,12 +15,10 @@ packages=(
   "pi-simplify|pi-simplify/packages/pi-simplify"
   "@juicesharp/rpiv-ask-user-question|juicesharp-rpiv-ask-user-question/packages/rpiv-ask-user-question"
   "pi-tool-display|pi-tool-display"
-  "pi-markdown-preview|pi-markdown-preview"
   "pi-btw|pi-btw"
   "pi-rewind|pi-rewind"
   "pi-glance|pi-glance"
   "@juicesharp/rpiv-todo|juicesharp-rpiv-ask-user-question/packages/rpiv-todo"
-  "pi-context-core|pi-context-core"
   "pi-hashline-edit-pro|pi-hashline-edit-pro"
 )
 
@@ -47,6 +46,7 @@ const root = process.env.PI_LOCAL_ROOT;
 const settingsPath = process.env.PI_SETTINGS_FILE;
 const settingsDir = path.dirname(settingsPath);
 const packagePaths = new Map([
+  ["@ginwzy/pi-extensions", "."],
   ["pi-rtk-optimizer", "pi-rtk-optimizer"],
   ["pi-subagents", "pi-subagents"],
   ["pi-mcp-adapter", "pi-mcp-adapter"],
@@ -54,18 +54,19 @@ const packagePaths = new Map([
   ["pi-simplify", "pi-simplify/packages/pi-simplify"],
   ["@juicesharp/rpiv-ask-user-question", "juicesharp-rpiv-ask-user-question/packages/rpiv-ask-user-question"],
   ["pi-tool-display", "pi-tool-display"],
-  ["pi-markdown-preview", "pi-markdown-preview"],
   ["pi-btw", "pi-btw"],
   ["pi-rewind", "pi-rewind"],
   ["pi-glance", "pi-glance"],
   ["@juicesharp/rpiv-todo", "juicesharp-rpiv-ask-user-question/packages/rpiv-todo"],
-  ["pi-context-core", "pi-context-core"],
   ["pi-hashline-edit-pro", "pi-hashline-edit-pro"],
 ]);
 
 const localSources = new Map(
   [...packagePaths].map(([name, relativePath]) => [name, path.join(root, relativePath)]),
 );
+const rootPackageName = "@ginwzy/pi-extensions";
+const standaloneGptFastModeName = "@tunnckocore/pi-gpt-fast-mode";
+const recognizedNpmNames = new Set([...localSources.keys(), standaloneGptFastModeName]);
 
 function sourceOf(entry) {
   return typeof entry === "string" ? entry : entry && typeof entry === "object" ? entry.source : undefined;
@@ -73,7 +74,7 @@ function sourceOf(entry) {
 
 function npmPackageName(source) {
   if (!source.startsWith("npm:")) return undefined;
-  for (const name of localSources.keys()) {
+  for (const name of recognizedNpmNames) {
     const prefix = `npm:${name}`;
     if (source === prefix || source.startsWith(`${prefix}@`)) return name;
   }
@@ -90,23 +91,48 @@ function localPackageName(source) {
   }
 }
 
+function gitPackageName(source) {
+  const normalized = source.toLowerCase().replace(/^git\+/, "").replace(/#.*$/, "").replace(/\.git$/, "");
+  if (/[@:/]github\.com[/:]tunnckocore\/pi-gpt-fast-mode$/.test(normalized)) {
+    return standaloneGptFastModeName;
+  }
+  if (/[@:/]github\.com[/:]ginwzy\/pi-extensions$/.test(normalized)) {
+    return rootPackageName;
+  }
+  return undefined;
+}
+
 function packageName(entry) {
   const source = sourceOf(entry);
   if (typeof source !== "string") return undefined;
-  return npmPackageName(source) ?? localPackageName(source);
+  return npmPackageName(source) ?? gitPackageName(source) ?? localPackageName(source);
 }
 
 function withSource(entry, source) {
   return typeof entry === "string" ? source : { ...entry, source };
 }
 
+function migrateStandaloneGptEntry(entry, source) {
+  if (typeof entry === "string") return source;
+  const { extensions, skills, prompts, themes, ...rest } = entry;
+  return { ...rest, source };
+}
+
 const settings = JSON.parse(fs.readFileSync(settingsPath, "utf8"));
 const current = Array.isArray(settings.packages) ? settings.packages : [];
+const hasRootEntry = current.some((entry) => packageName(entry) === rootPackageName);
 const seen = new Set();
 const next = [];
 
 for (const entry of current) {
   const name = packageName(entry);
+  if (name === standaloneGptFastModeName) {
+    if (!hasRootEntry && !seen.has(rootPackageName)) {
+      next.push(migrateStandaloneGptEntry(entry, localSources.get(rootPackageName)));
+      seen.add(rootPackageName);
+    }
+    continue;
+  }
   if (!localSources.has(name)) {
     next.push(entry);
     continue;
