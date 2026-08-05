@@ -4,3 +4,4 @@ dist/
 .DS_Store
 .pi-subagents/
 /pi-gpt-fast-mode/
+.upstream-reviews/
