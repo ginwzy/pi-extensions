@@ -138,6 +138,16 @@ export function cmdAbortTask(pi: TaskCommandAPI): CommandOptions {
   };
 }
 
+export function cmdTasks(): CommandOptions {
+  return {
+    description: "List current and pending task branches",
+    handler: async (_args: string, ctx: ExtensionCommandContext) => {
+      await ctx.waitForIdle();
+      ctx.ui.notify(formatTaskList(ctx.sessionManager), "info");
+    },
+  };
+}
+
 export function cmdAuto(pi: AutoCommandAPI): CommandOptions {
   let running = false;
   let stopCurrentRun: (() => void) | null = null;
@@ -495,6 +505,28 @@ function refreshTaskStatus(ctx: TaskStatusContext, options: TaskStatusOptions = 
 
 type TaskStatusContext = Pick<ExtensionCommandContext, "hasUI" | "sessionManager" | "ui">;
 
+function formatTaskList(session: ReadonlySessionLike): string {
+  const lines: string[] = ["Tasks"];
+  const active = currentTask(session);
+  if (active) {
+    lines.push(`Current: ${taskTitle(active.data.title)}`);
+  } else {
+    lines.push("Current: none");
+  }
+
+  const pending = pendingTasks(session);
+  if (pending.length === 0) {
+    lines.push("Pending: none");
+  } else {
+    lines.push("Pending:");
+    pending.forEach((task, index) => {
+      lines.push(`${index + 1}. ${taskTitle(task.data.title)}`);
+    });
+  }
+
+  return lines.join("\n");
+}
+
 /** Type guard: is the entry an assistant message with content? */
 function isAssistantMessageEntry(
   entry: SessionEntry,
@@ -552,25 +584,33 @@ function findPreConversationEntry(session: ReadonlySessionLike): SessionEntry | 
 // ── Lookup utilities ──────────────────────────────────────────────
 
 function pendingTask(session: ReadonlySessionLike): TaskEntry | null {
+  return pendingTasks(session)[0] ?? null;
+}
+
+function pendingTasks(session: ReadonlySessionLike): TaskEntry[] {
   const branch = session.getBranch();
+  const tasks: TaskEntry[] = [];
   let skip = 0;
 
   for (let i = branch.length - 1; i >= 0; i--) {
     const entry = branch[i];
     if (entry.type === "custom" && entry.customType === TASK_START_ENTRY_TYPE) {
-      return null;
+      break;
     }
     if (entry.type === "custom" && entry.customType === TASK_DONE_ENTRY_TYPE) {
       skip++;
       continue;
     }
     if (isTaskEntry(entry)) {
-      if (skip === 0) return entry;
-      skip--;
+      if (skip === 0) {
+        tasks.push(entry);
+      } else {
+        skip--;
+      }
     }
   }
 
-  return null;
+  return tasks;
 }
 
 const TASK_DONE_ENTRY_TYPE = "task-done";

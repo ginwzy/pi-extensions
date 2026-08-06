@@ -29,6 +29,7 @@ The root manifest exposes:
 - `extensions/pi-tool-display/index.ts`, package-owned Tool Display source.
 - `extensions/pi-tasks/index.ts`, package-owned Task Branches source.
 
+Task Branches provides `push-task`, `/tasks`, `/start-task`, `/discard-task`, `/finish-task`, `/abort-task`, and `/auto`.
 
 Do not enable the root package alongside standalone packages that it owns. The installer writes the root package and the enabled standalone local package paths.
 

@@ -5,6 +5,7 @@ import {
   cmdAuto,
   cmdDiscardTask,
   cmdFinishTask,
+  cmdTasks,
   toolPushTask,
   cmdStartTask,
   rendererTaskResult,
@@ -19,6 +20,7 @@ export default function register(pi: ExtensionAPI): void {
   pi.registerCommand("discard-task", cmdDiscardTask(pi));
   pi.registerCommand("finish-task", cmdFinishTask(pi));
   pi.registerCommand("abort-task", cmdAbortTask(pi));
+  pi.registerCommand("tasks", cmdTasks());
   pi.registerCommand("auto", cmdAuto(pi));
 
   pi.registerMessageRenderer("task-result", rendererTaskResult);
