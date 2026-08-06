@@ -19,7 +19,7 @@
   "pi": {
     "extensions": [
       "./extensions/pi-tool-display/index.ts",
-      "./extensions/pi-supergsd/index.ts"
+      "./extensions/pi-tasks/index.ts"
     ],
     "skills": [
       "!skills/**"
