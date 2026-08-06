@@ -20,7 +20,8 @@
   ],
   "pi": {
     "extensions": [
-      "./src/index.ts"
+      "./src/index.ts",
+      "./node_modules/pi-mcp-adapter/index.ts"
     ],
     "skills": [
       "!skills/**"
@@ -35,6 +36,9 @@
   },
   "peerDependencies": {
     "@earendil-works/pi-coding-agent": "*"
+  },
+  "dependencies": {
+    "pi-mcp-adapter": "https://github.com/ginwzy/pi-mcp-adapter/archive/82724dccc13a49310530898f922bafff12b7f3fe.tar.gz"
   },
   "devDependencies": {
     "@earendil-works/pi-coding-agent": "^0.83.0",

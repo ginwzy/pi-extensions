@@ -140,11 +140,13 @@ function packageManager(projectSettings: Record<string, unknown> = {}) {
 }
 
 describe("package discovery", () => {
-  test("loads one package extension and excludes the carried maintenance skill", async () => {
+  test("loads package extensions and excludes the carried maintenance skill", async () => {
     const resolved = await packageManager().resolveExtensionSources([ROOT], { temporary: true });
 
-    expect(resolved.extensions.filter((entry) => entry.enabled)).toHaveLength(1);
-    expect(resolved.extensions[0]?.path).toBe(resolve(ROOT, "src/index.ts"));
+    expect(resolved.extensions.filter((entry) => entry.enabled).map((entry) => entry.path)).toEqual([
+      resolve(ROOT, "src/index.ts"),
+      resolve(ROOT, "node_modules/pi-mcp-adapter/index.ts"),
+    ]);
     expect(resolved.skills).toEqual([]);
     expect(manifest.files).toContain("skills/upstream-review");
   });

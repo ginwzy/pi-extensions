@@ -7,8 +7,9 @@ and that entry hosts independently owned modules from `src/modules/`.
 Runtime source is owned by this package. Retained Git checkouts are upstream references
 for review and provenance, not runtime dependencies; Pi's non-recursive Git package
 clone therefore does not need submodules to load the migrated modules. GPT Fast Mode
-is the first migrated module. The remaining extensions continue to run as separate
-packages until they reach parity in the All-in-One host.
+is the first migrated module. Heavier extensions can be carried as pinned package
+dependencies, and the remaining extensions continue to run as separate packages until
+they reach parity in the All-in-One host.
 
 Some upstream projects are monorepos. Their reference checkouts use Git sparse-checkout
 and only check out the relevant package directory.
@@ -18,7 +19,7 @@ and only check out the relevant package directory.
 | Directory | Runtime/integration path | Upstream | Fork | Default |
 |---|---|---|---|---|
 | `upstream-references/pi-gpt-fast-mode` | `src/modules/gpt-fast-mode` | `tunnckoCore/pi-gpt-fast-mode` | package-owned integration | enabled |
-| `pi-mcp-adapter` | `pi-mcp-adapter` | `nicobailon/pi-mcp-adapter` | `ginwzy/pi-mcp-adapter` | enabled |
+| `node_modules/pi-mcp-adapter` | dependency-carried external package | `nicobailon/pi-mcp-adapter` | `ginwzy/pi-mcp-adapter` | enabled |
 | `pi-tool-display` | `pi-tool-display` | `MasuRii/pi-tool-display` | `ginwzy/pi-tool-display` | enabled |
 | `ff-labs-pi-fff` | `ff-labs-pi-fff/packages/pi-fff` | `dmtrKovalenko/fff` | `ginwzy/fff` | enabled |
 | `juicesharp-rpiv-ask-user-question` | `packages/rpiv-ask-user-question`, `packages/rpiv-todo` | `juicesharp/rpiv-mono` | `ginwzy/rpiv-mono` | enabled |
@@ -31,7 +32,8 @@ and only check out the relevant package directory.
 
 ## All-in-One package
 
-The root manifest exposes exactly one extension, `src/index.ts`. The host registers
+The root manifest exposes the All-in-One host extension plus selected dependency-carried
+external package entrypoints. The host registers
 modules in deterministic order, rejects cross-module registration collisions, isolates
 module-level API overrides, and cleans up shared event-bus subscriptions at shutdown.
 The first module, GPT Fast Mode, preserves its `/fast` command, shortcut, provider hook,
@@ -44,10 +46,10 @@ pi install /absolute/path/to/pi-extensions
 pi install git:github.com/ginwzy/pi-extensions
 ```
 
-Do not enable the root package alongside the standalone
-`@tunnckocore/pi-gpt-fast-mode` package: both own `/fast`. The installer below replaces
-standalone GPT Fast Mode npm, Git, and local entries with the All-in-One root while
-keeping the other extensions standalone until they migrate.
+Do not enable the root package alongside standalone packages that it owns or carries.
+The installer below replaces standalone GPT Fast Mode npm, Git, and local entries with
+the All-in-One root, keeps dependency-carried external packages out of settings, and
+writes the remaining enabled local package paths.
 Persistent All-in-One module activation is intentionally deferred; the current slice
 loads GPT Fast Mode by default, while its existing Pi settings control the feature's
 initial on/off state.

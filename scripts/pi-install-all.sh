@@ -9,7 +9,6 @@ settings="${PI_SETTINGS_FILE:-$HOME/.pi/agent/settings.json}"
 packages=(
   "@ginwzy/pi-extensions|."
   "pi-rtk-optimizer|pi-rtk-optimizer"
-  "pi-mcp-adapter|pi-mcp-adapter"
   "@ff-labs/pi-fff|ff-labs-pi-fff/packages/pi-fff"
   "pi-simplify|pi-simplify/packages/pi-simplify"
   "@juicesharp/rpiv-ask-user-question|juicesharp-rpiv-ask-user-question/packages/rpiv-ask-user-question"
@@ -45,7 +44,6 @@ const settingsDir = path.dirname(settingsPath);
 const packagePaths = new Map([
   ["@ginwzy/pi-extensions", "."],
   ["pi-rtk-optimizer", "pi-rtk-optimizer"],
-  ["pi-mcp-adapter", "pi-mcp-adapter"],
   ["@ff-labs/pi-fff", "ff-labs-pi-fff/packages/pi-fff"],
   ["pi-simplify", "pi-simplify/packages/pi-simplify"],
   ["@juicesharp/rpiv-ask-user-question", "juicesharp-rpiv-ask-user-question/packages/rpiv-ask-user-question"],

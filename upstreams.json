@@ -20,14 +20,6 @@
       "entrypoints": ["index.ts"]
     },
     {
-      "id": "pi-mcp-adapter",
-      "path": "pi-mcp-adapter",
-      "repository": "https://github.com/nicobailon/pi-mcp-adapter.git",
-      "branch": "main",
-      "scopes": [],
-      "entrypoints": ["index.ts"]
-    },
-    {
       "id": "pi-tool-display",
       "path": "pi-tool-display",
       "repository": "https://github.com/MasuRii/pi-tool-display.git",
