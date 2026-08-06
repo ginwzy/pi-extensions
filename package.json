@@ -19,7 +19,8 @@
   "pi": {
     "extensions": [
       "./extensions/pi-tool-display/index.ts",
-      "./extensions/pi-tasks/index.ts"
+      "./extensions/pi-tasks/index.ts",
+      "./extensions/pi-rewind/src/index.ts"
     ],
     "skills": [
       "!skills/**"

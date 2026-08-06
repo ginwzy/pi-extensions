@@ -14,7 +14,6 @@ packages=(
   "pi-simplify|pi-simplify/packages/pi-simplify"
   "@juicesharp/rpiv-ask-user-question|juicesharp-rpiv-ask-user-question/packages/rpiv-ask-user-question"
   "pi-btw|pi-btw"
-  "pi-rewind|pi-rewind"
   "@juicesharp/rpiv-todo|juicesharp-rpiv-ask-user-question/packages/rpiv-todo"
 )
 
@@ -49,7 +48,6 @@ const packagePaths = new Map([
   ["pi-simplify", "pi-simplify/packages/pi-simplify"],
   ["@juicesharp/rpiv-ask-user-question", "juicesharp-rpiv-ask-user-question/packages/rpiv-ask-user-question"],
   ["pi-btw", "pi-btw"],
-  ["pi-rewind", "pi-rewind"],
   ["@juicesharp/rpiv-todo", "juicesharp-rpiv-ask-user-question/packages/rpiv-todo"],
 ]);
 
@@ -57,8 +55,16 @@ const localSources = new Map(
   [...packagePaths].map(([name, relativePath]) => [name, path.join(root, relativePath)]),
 );
 const rootPackageName = "@ginwzy/pi-extensions";
-const removedPiRewindName = "@ayulab/pi-rewind";
-const recognizedNpmNames = new Set([...localSources.keys(), removedPiRewindName]);
+const removedAyuRewindName = "@ayulab/pi-rewind";
+const rootOwnedStandaloneNames = new Set(["pi-rewind"]);
+const recognizedNpmNames = new Set([
+  ...localSources.keys(),
+  removedAyuRewindName,
+  ...rootOwnedStandaloneNames,
+]);
+const rootOwnedStandaloneSources = new Set(
+  [...rootOwnedStandaloneNames].map((name) => path.join(root, name)),
+);
 
 function sourceOf(entry) {
   return typeof entry === "string" ? entry : entry && typeof entry === "object" ? entry.source : undefined;
@@ -88,6 +94,9 @@ function gitPackageName(source) {
   if (/[@:/]github\.com[/:]ginwzy\/pi-extensions$/.test(normalized)) {
     return rootPackageName;
   }
+  if (/[@:/]github\.com[/:](arpagon|ginwzy)\/pi-rewind$/.test(normalized)) {
+    return "pi-rewind";
+  }
   return undefined;
 }
 
@@ -95,6 +104,11 @@ function packageName(entry) {
   const source = sourceOf(entry);
   if (typeof source !== "string") return undefined;
   return npmPackageName(source) ?? gitPackageName(source) ?? localPackageName(source);
+}
+
+function isRootOwnedStandaloneSource(source) {
+  if (typeof source !== "string" || /^(npm:|git:|https?:|ssh:|git:)/.test(source)) return false;
+  return rootOwnedStandaloneSources.has(path.resolve(settingsDir, source));
 }
 
 function withSource(entry, source) {
@@ -107,8 +121,9 @@ const seen = new Set();
 const next = [];
 
 for (const entry of current) {
+  const source = sourceOf(entry);
   const name = packageName(entry);
-  if (npmPackageName(sourceOf(entry)) === removedPiRewindName) {
+  if (npmPackageName(source) === removedAyuRewindName || rootOwnedStandaloneNames.has(name) || isRootOwnedStandaloneSource(source)) {
     continue;
   }
   if (!localSources.has(name)) {

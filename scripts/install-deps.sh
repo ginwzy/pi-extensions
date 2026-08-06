@@ -25,8 +25,7 @@ npm_install "."
 # Standalone packages currently enabled in Pi.
 for dir in \
   pi-mcp-adapter \
-  pi-btw \
-  pi-rewind
+  pi-btw
 do
   npm_install "$dir"
 done

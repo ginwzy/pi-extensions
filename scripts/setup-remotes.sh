@@ -27,4 +27,3 @@ set_remote ff-labs-pi-fff upstream https://github.com/dmtrKovalenko/fff.git
 set_remote juicesharp-rpiv-ask-user-question upstream https://github.com/juicesharp/rpiv-mono.git
 set_remote pi-simplify upstream https://github.com/MattDevy/pi-extensions.git
 set_remote pi-btw upstream https://github.com/dbachelder/pi-btw.git
-set_remote pi-rewind upstream https://github.com/arpagon/pi-rewind.git

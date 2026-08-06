@@ -16,9 +16,6 @@
 [submodule "pi-btw"]
 	path = pi-btw
 	url = https://github.com/ginwzy/pi-btw.git
-[submodule "pi-rewind"]
-	path = pi-rewind
-	url = https://github.com/ginwzy/pi-rewind.git
 [submodule "pi-mcp-adapter"]
 	path = pi-mcp-adapter
 	url = https://github.com/ginwzy/pi-mcp-adapter.git

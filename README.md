@@ -10,17 +10,19 @@ Package-owned extension source lives under `extensions/`. Remaining submodules a
 |---|---|---|---|---|
 | `extensions/pi-tool-display` | `extensions/pi-tool-display` | `MasuRii/pi-tool-display` | package-owned integration | enabled |
 | `extensions/pi-tasks` | `extensions/pi-tasks` | `skhoroshavin/pi-supergsd` | package-owned integration | enabled |
+| `extensions/pi-rewind` | `extensions/pi-rewind` | `arpagon/pi-rewind` | package-owned integration | enabled |
 | `pi-mcp-adapter` | `pi-mcp-adapter` | `nicobailon/pi-mcp-adapter` | `ginwzy/pi-mcp-adapter` | enabled |
 | `ff-labs-pi-fff` | `ff-labs-pi-fff/packages/pi-fff` | `dmtrKovalenko/fff` | `ginwzy/fff` | enabled |
 | `juicesharp-rpiv-ask-user-question` | `packages/rpiv-ask-user-question`, `packages/rpiv-todo` | `juicesharp/rpiv-mono` | `ginwzy/rpiv-mono` | enabled |
 | `pi-simplify` | `pi-simplify/packages/pi-simplify` | `MattDevy/pi-extensions` | `ginwzy/pi-extensions-1` | enabled |
 | `pi-btw` | `pi-btw` | `dbachelder/pi-btw` | `ginwzy/pi-btw` | enabled |
-| `pi-rewind` | `pi-rewind` | `arpagon/pi-rewind` | `ginwzy/pi-rewind` | enabled |
 | `pi-rtk-optimizer` | `pi-rtk-optimizer` | `MasuRii/pi-rtk-optimizer` | `ginwzy/pi-rtk-optimizer` | enabled |
 
 `extensions/pi-tool-display` includes the fork commits for colored tool pills and the Pi 0.83 peer-runtime compatibility metadata from `ginwzy/pi-tool-display` commit `f9bad41f9d880497c36500dee5177c1ea3292ac0`.
 
 `extensions/pi-tasks` was adapted from `skhoroshavin/pi-supergsd` commit `69f0650f64e999cb093e8e554a2a5cc39905ca5e` so its task-branch runtime can be modified as package-owned source.
+
+`extensions/pi-rewind` was adapted from `arpagon/pi-rewind` commit `91611ad87992fb7b635a41ba68f67916ff6e6ae3` so its checkpoint runtime can be modified as package-owned source. It keeps explicit `/rewind`, `Esc Esc`, checkpointing, and fork restore behavior, but does not prompt for file restore on ordinary session tree navigation.
 
 ## Root Package
 
@@ -28,8 +30,11 @@ The root manifest exposes:
 
 - `extensions/pi-tool-display/index.ts`, package-owned Tool Display source.
 - `extensions/pi-tasks/index.ts`, package-owned Task Branches source.
+- `extensions/pi-rewind/src/index.ts`, package-owned Rewind source.
 
 Task Branches provides `push-task`, `/tasks`, `/start-task`, `/discard-task`, `/finish-task`, `/abort-task`, and `/auto`.
+
+Rewind provides `/rewind`, `Esc Esc`, automatic checkpoints after mutating turns, and fork restore prompts. It intentionally does not prompt on normal session tree navigation so task branches can start and finish without file-restore interruption.
 
 Do not enable the root package alongside standalone packages that it owns. The installer writes the root package and the enabled standalone local package paths.
 
