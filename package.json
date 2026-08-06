@@ -14,14 +14,15 @@
   },
   "files": [
     "src",
-    "skills/upstream-review",
+    "extensions",
     "README.md",
     "THIRD_PARTY_NOTICES.md"
   ],
   "pi": {
     "extensions": [
       "./src/index.ts",
-      "./node_modules/pi-mcp-adapter/index.ts"
+      "./node_modules/pi-mcp-adapter/index.ts",
+      "./extensions/pi-tool-display/index.ts"
     ],
     "skills": [
       "!skills/**"
@@ -35,7 +36,8 @@
     "check": "npm run typecheck && npm test"
   },
   "peerDependencies": {
-    "@earendil-works/pi-coding-agent": "*"
+    "@earendil-works/pi-coding-agent": "*",
+    "@earendil-works/pi-tui": "*"
   },
   "dependencies": {
     "pi-mcp-adapter": "https://github.com/ginwzy/pi-mcp-adapter/archive/82724dccc13a49310530898f922bafff12b7f3fe.tar.gz"
@@ -44,7 +46,8 @@
     "@earendil-works/pi-coding-agent": "^0.83.0",
     "@types/node": "^24.10.0",
     "typescript": "^5.9.3",
-    "vitest": "^3.2.4"
+    "vitest": "^3.2.4",
+    "@earendil-works/pi-tui": "^0.83.0"
   },
   "engines": {
     "node": ">=22.19.0"

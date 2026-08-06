@@ -1,10 +1,6 @@
 [submodule "pi-rtk-optimizer"]
 	path = pi-rtk-optimizer
 	url = https://github.com/ginwzy/pi-rtk-optimizer.git
-[submodule "pi-tool-display"]
-	path = pi-tool-display
-	url = https://github.com/ginwzy/pi-tool-display.git
-	ignore = dirty
 [submodule "ff-labs-pi-fff"]
 	path = ff-labs-pi-fff
 	url = https://github.com/ginwzy/fff.git

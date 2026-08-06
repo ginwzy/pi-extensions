@@ -140,34 +140,18 @@ function packageManager(projectSettings: Record<string, unknown> = {}) {
 }
 
 describe("package discovery", () => {
-  test("loads package extensions and excludes the carried maintenance skill", async () => {
+  test("loads package extensions without package skills", async () => {
     const resolved = await packageManager().resolveExtensionSources([ROOT], { temporary: true });
 
     expect(resolved.extensions.filter((entry) => entry.enabled).map((entry) => entry.path)).toEqual([
       resolve(ROOT, "src/index.ts"),
       resolve(ROOT, "node_modules/pi-mcp-adapter/index.ts"),
+      resolve(ROOT, "extensions/pi-tool-display/index.ts"),
     ]);
     expect(resolved.skills).toEqual([]);
-    expect(manifest.files).toContain("skills/upstream-review");
+    expect(manifest.files).toContain("extensions");
   });
 
-  test("does not let a package filter re-enable a manifest-excluded skill", async () => {
-    const resolved = await packageManager({
-      packages: [{ source: ROOT, skills: ["skills/**"] }],
-    }).resolve();
-
-    expect(resolved.skills.filter((entry) =>
-      entry.path === resolve(ROOT, "skills/upstream-review/SKILL.md") && entry.enabled)).toEqual([]);
-  });
-
-  test("loads upstream-review only from this project's explicit settings path", async () => {
-    const resolved = await packageManager({ skills: ["../skills/upstream-review"] }).resolve();
-
-    expect(resolved.skills.filter((entry) =>
-      entry.path === resolve(ROOT, "skills/upstream-review/SKILL.md") && entry.enabled).map((entry) => entry.path)).toEqual([
-      resolve(ROOT, "skills/upstream-review/SKILL.md"),
-    ]);
-  });
 });
 
 describe("module host", () => {

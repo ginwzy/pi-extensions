@@ -3,4 +3,3 @@ dist/
 *.tgz
 .DS_Store
 /pi-gpt-fast-mode/
-.upstream-reviews/

@@ -12,7 +12,6 @@ packages=(
   "@ff-labs/pi-fff|ff-labs-pi-fff/packages/pi-fff"
   "pi-simplify|pi-simplify/packages/pi-simplify"
   "@juicesharp/rpiv-ask-user-question|juicesharp-rpiv-ask-user-question/packages/rpiv-ask-user-question"
-  "pi-tool-display|pi-tool-display"
   "pi-btw|pi-btw"
   "pi-rewind|pi-rewind"
   "@juicesharp/rpiv-todo|juicesharp-rpiv-ask-user-question/packages/rpiv-todo"
@@ -47,7 +46,6 @@ const packagePaths = new Map([
   ["@ff-labs/pi-fff", "ff-labs-pi-fff/packages/pi-fff"],
   ["pi-simplify", "pi-simplify/packages/pi-simplify"],
   ["@juicesharp/rpiv-ask-user-question", "juicesharp-rpiv-ask-user-question/packages/rpiv-ask-user-question"],
-  ["pi-tool-display", "pi-tool-display"],
   ["pi-btw", "pi-btw"],
   ["pi-rewind", "pi-rewind"],
   ["@juicesharp/rpiv-todo", "juicesharp-rpiv-ask-user-question/packages/rpiv-todo"],

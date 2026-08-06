@@ -24,9 +24,8 @@ npm_install "."
 
 # Standalone packages currently enabled in Pi.
 for dir in \
-  pi-tool-display \
   pi-btw \
-  pi-rewind \
+  pi-rewind
 do
   npm_install "$dir"
 done
