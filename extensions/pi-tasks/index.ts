@@ -8,8 +8,10 @@ import {
   cmdTasks,
   toolPushTask,
   cmdStartTask,
+  rendererTaskList,
   rendererTaskResult,
   setSkillsFromEvent,
+  isTaskListMessage,
   setModelRegistry,
   updateTaskStatus,
 } from "./src/index.js";
@@ -20,10 +22,17 @@ export default function register(pi: ExtensionAPI): void {
   pi.registerCommand("discard-task", cmdDiscardTask(pi));
   pi.registerCommand("finish-task", cmdFinishTask(pi));
   pi.registerCommand("abort-task", cmdAbortTask(pi));
-  pi.registerCommand("tasks", cmdTasks());
+  pi.registerCommand("tasks", cmdTasks(pi));
   pi.registerCommand("auto", cmdAuto(pi));
 
   pi.registerMessageRenderer("task-result", rendererTaskResult);
+  pi.registerMessageRenderer("task-list", rendererTaskList);
+
+  pi.on("context", async (event) => {
+    return {
+      messages: event.messages.filter((message) => !isTaskListMessage(message)),
+    };
+  });
 
   pi.on("before_agent_start", async (event) => {
     if (event.systemPromptOptions.skills?.length) {

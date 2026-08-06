@@ -138,12 +138,21 @@ export function cmdAbortTask(pi: TaskCommandAPI): CommandOptions {
   };
 }
 
-export function cmdTasks(): CommandOptions {
+export function cmdTasks(pi: TaskListAPI): CommandOptions {
   return {
     description: "List current and pending task branches",
     handler: async (_args: string, ctx: ExtensionCommandContext) => {
       await ctx.waitForIdle();
-      ctx.ui.notify(formatTaskList(ctx.sessionManager), "info");
+      const details = buildTaskList(ctx.sessionManager);
+      pi.sendMessage(
+        {
+          customType: TASK_LIST_MESSAGE_TYPE,
+          content: formatTaskListText(details),
+          display: true,
+          details,
+        },
+        { triggerTurn: false },
+      );
     },
   };
 }
@@ -241,6 +250,22 @@ export const rendererTaskResult: MessageRenderer<{ title?: string }> = (
   return box;
 };
 
+export const rendererTaskList: MessageRenderer<TaskListDetails> = (
+  message,
+  _options,
+  theme,
+): Box => {
+  const details = isTaskListDetails(message.details) ? message.details : undefined;
+  const lines = details ? renderTaskListLines(details, theme) : [renderTextContent(message.content)];
+  const box = new Box(1, 1, (text: string) => theme.bg("customMessageBg", text));
+  box.addChild(new Text(lines.join("\n"), 0, 0));
+  return box;
+};
+
+export function isTaskListMessage(message: { role: string; customType?: string }): boolean {
+  return message.role === "custom" && message.customType === TASK_LIST_MESSAGE_TYPE;
+}
+
 export function updateTaskStatus(
   session: ReadonlySessionLike,
   setStatus: (key: string, value: string | undefined) => void,
@@ -289,6 +314,8 @@ type CommandOptions = Omit<RegisteredCommand, "name" | "sourceInfo">;
 
 type PushTaskAPI = Pick<ExtensionAPI, "appendEntry">;
 
+type TaskListAPI = Pick<ExtensionAPI, "sendMessage">;
+
 interface AutoCommandAPI extends TaskCommandAPI {
   on(eventName: "session_shutdown", handler: () => unknown): void;
 }
@@ -305,6 +332,21 @@ type TaskActionOptions = {
   statusPrefix?: string;
   modelArg?: string;
 };
+
+type TaskListDetails = {
+  current?: TaskListItem;
+  pending: TaskListItem[];
+  hiddenPendingCount: number;
+};
+
+type TaskListItem = {
+  title: string;
+  promptLines?: number;
+};
+
+const TASK_LIST_MESSAGE_TYPE = "task-list";
+
+const MAX_LISTED_TASKS = 10;
 
 function lastAssistantWasAborted(session: ReadonlySessionLike): boolean {
   const branch = session.getBranch();
@@ -505,26 +547,83 @@ function refreshTaskStatus(ctx: TaskStatusContext, options: TaskStatusOptions = 
 
 type TaskStatusContext = Pick<ExtensionCommandContext, "hasUI" | "sessionManager" | "ui">;
 
-function formatTaskList(session: ReadonlySessionLike): string {
-  const lines: string[] = ["Tasks"];
-  const active = currentTask(session);
-  if (active) {
-    lines.push(`Current: ${taskTitle(active.data.title)}`);
-  } else {
-    lines.push("Current: none");
-  }
+function buildTaskList(session: ReadonlySessionLike): TaskListDetails {
+  const pending = pendingTasks(session).map((task) => ({
+    title: taskTitle(task.data.title),
+    promptLines: promptLineCount(task.data.prompt),
+  }));
 
-  const pending = pendingTasks(session);
-  if (pending.length === 0) {
+  const listedPending = pending.slice(0, MAX_LISTED_TASKS);
+  const current = currentTask(session);
+  return {
+    current: current ? { title: taskTitle(current.data.title) } : undefined,
+    pending: listedPending,
+    hiddenPendingCount: Math.max(0, pending.length - listedPending.length),
+  };
+}
+
+function formatTaskListText(details: TaskListDetails): string {
+  const lines = ["Task Branches"];
+  lines.push(`Current: ${details.current?.title ?? "none"}`);
+
+  if (details.pending.length === 0) {
     lines.push("Pending: none");
   } else {
     lines.push("Pending:");
-    pending.forEach((task, index) => {
-      lines.push(`${index + 1}. ${taskTitle(task.data.title)}`);
+    details.pending.forEach((task, index) => {
+      const suffix = task.promptLines === undefined ? "" : ` (${task.promptLines} lines)`;
+      lines.push(`${index + 1}. ${task.title}${suffix}`);
     });
+    if (details.hiddenPendingCount > 0) {
+      lines.push(`... ${details.hiddenPendingCount} more`);
+    }
   }
 
   return lines.join("\n");
+}
+
+function renderTaskListLines(details: TaskListDetails, theme: Pick<Theme, "fg" | "bold">): string[] {
+  const lines = [theme.fg("customMessageLabel", theme.bold("Task Branches")), ""];
+  lines.push(theme.fg("muted", "Current"));
+  lines.push(`  ${details.current?.title ?? theme.fg("dim", "none")}`);
+  lines.push("");
+  lines.push(theme.fg("muted", "Pending"));
+
+  if (details.pending.length === 0) {
+    lines.push(`  ${theme.fg("dim", "none")}`);
+  } else {
+    details.pending.forEach((task, index) => {
+      const suffix = task.promptLines === undefined ? "" : theme.fg("dim", `  ${task.promptLines} lines`);
+      lines.push(`  ${theme.fg("dim", `${index + 1}.`)} ${task.title}${suffix}`);
+    });
+    if (details.hiddenPendingCount > 0) {
+      lines.push(`  ${theme.fg("dim", `... ${details.hiddenPendingCount} more`)}`);
+    }
+  }
+
+  return lines;
+}
+
+function promptLineCount(prompt: string): number {
+  return prompt.length === 0 ? 0 : prompt.split(/\r\n|\r|\n/).length;
+}
+
+function isTaskListDetails(value: unknown): value is TaskListDetails {
+  return (
+    isRecord(value) &&
+    (value.current === undefined || isTaskListItem(value.current)) &&
+    Array.isArray(value.pending) &&
+    value.pending.every(isTaskListItem) &&
+    typeof value.hiddenPendingCount === "number"
+  );
+}
+
+function isTaskListItem(value: unknown): value is TaskListItem {
+  return (
+    isRecord(value) &&
+    typeof value.title === "string" &&
+    (value.promptLines === undefined || typeof value.promptLines === "number")
+  );
 }
 
 /** Type guard: is the entry an assistant message with content? */
