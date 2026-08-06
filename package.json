@@ -14,8 +14,7 @@
   },
   "files": [
     "extensions",
-    "README.md",
-    "THIRD_PARTY_NOTICES.md"
+    "README.md"
   ],
   "pi": {
     "extensions": [
