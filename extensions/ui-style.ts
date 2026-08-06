@@ -78,21 +78,21 @@ const ASCII_GLYPHS: UiGlyphs = {
 };
 
 const NERD_FONT_TERMINALS = new Set([
-  "iTerm.app",
-  "Ghostty",
-  "WezTerm",
+  "iterm.app",
+  "ghostty",
+  "wezterm",
   "kitty",
   "rio",
   "tabby",
-  "WindowsTerminal",
+  "windowsterminal",
   "vscode",
 ]);
 
 export function detectNerdFont(): boolean {
   const termProgram = process.env.TERM_PROGRAM;
-  if (termProgram && NERD_FONT_TERMINALS.has(termProgram)) return true;
+  if (termProgram && NERD_FONT_TERMINALS.has(termProgram.toLowerCase())) return true;
   const lcTerminal = process.env.LC_TERMINAL;
-  if (lcTerminal && NERD_FONT_TERMINALS.has(lcTerminal)) return true;
+  if (lcTerminal && NERD_FONT_TERMINALS.has(lcTerminal.toLowerCase())) return true;
   if (process.env.TERM === "xterm-kitty") return true;
   if (process.env.WT_SESSION) return true;
   return false;
