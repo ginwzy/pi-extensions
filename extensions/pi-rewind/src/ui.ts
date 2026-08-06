@@ -5,7 +5,7 @@
  */
 
 import type { ExtensionContext } from "@earendil-works/pi-coding-agent";
-import { clearRootStatus, setRootStatus } from "../../pi-footer/src/status-store.js";
+import { clearRootStatus, setRootStatus } from "../../pi-shell/src/status-store.js";
 import type { RewindState } from "./state.js";
 
 const STATUS_KEY = "rewind";

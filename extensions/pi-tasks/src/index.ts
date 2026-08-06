@@ -19,7 +19,7 @@ import { Box, Text, type AutocompleteItem } from "@earendil-works/pi-tui";
 import { Type, type Static } from "typebox";
 
 import { renderTextContent, taskResultTextContent } from "./text-content.js";
-import { setRootStatus } from "../../pi-footer/src/status-store.js";
+import { setRootStatus } from "../../pi-shell/src/status-store.js";
 import {
   bold,
   boxedLines,

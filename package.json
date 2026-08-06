@@ -18,7 +18,7 @@
   ],
   "pi": {
     "extensions": [
-      "./extensions/pi-footer/index.ts",
+      "./extensions/pi-shell/index.ts",
       "./extensions/pi-tool-display/index.ts",
       "./extensions/pi-tasks/index.ts",
       "./extensions/pi-rewind/src/index.ts"
@@ -30,8 +30,9 @@
     "themes": []
   },
   "scripts": {
+    "test": "rm -rf .test-dist && tsc -p tsconfig.test.json && node --test .test-dist/extensions/pi-shell/src/*.test.js",
     "typecheck": "tsc --noEmit",
-    "check": "npm run typecheck"
+    "check": "npm run test && npm run typecheck"
   },
   "peerDependencies": {
     "@earendil-works/pi-coding-agent": "*",

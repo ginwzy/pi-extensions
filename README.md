@@ -25,16 +25,18 @@ Package-owned extension source lives under `extensions/`. Remaining submodules a
 
 `extensions/pi-rewind` was adapted from `arpagon/pi-rewind` commit `91611ad87992fb7b635a41ba68f67916ff6e6ae3` so its checkpoint runtime can be modified as package-owned source. It keeps explicit `/rewind`, `Esc Esc`, checkpointing, and fork restore behavior, but does not prompt for file restore on ordinary session tree navigation.
 
+The `pi-shell` startup header is a project-native implementation inspired by the MIT-licensed `eriiic7z/pi-cc-header` v1.0.1 visual direction. It uses this repository's theme and layout primitives and does not carry over the upstream settings mutations or command surface.
+
 ## Root Package
 
 The root manifest exposes:
 
-- `extensions/pi-footer/index.ts`, package-owned footer/status aggregator.
+- `extensions/pi-shell/index.ts`, package-owned startup header and footer/status aggregator.
 - `extensions/pi-tool-display/index.ts`, package-owned Tool Display source.
 - `extensions/pi-tasks/index.ts`, package-owned Task Branches source.
 - `extensions/pi-rewind/src/index.ts`, package-owned Rewind source.
 
-The root footer aggregator owns the package's status surface. It renders a custom Pi footer from structured root-owned statuses plus Pi footer data, using semantic glyphs, theme color slots, compact separators, and width-aware priority clipping. Shared terminal UI primitives auto-select Nerd Font glyphs or ASCII fallback, with `PI_EXTENSIONS_ICON_MODE=nerd|ascii|auto` available for explicit control. Task Branches and Rewind publish status into this shared surface instead of writing independent footer strings. External extension statuses are filtered before display so context totals, idle markers, and steady-state transport summaries do not duplicate the footer's resource group.
+The root shell owns the package's status surface. Its responsive startup header renders a theme-aware Pi mark, version, workspace, and path; new sessions play a short reveal while reloads and resumed sessions render immediately. Its footer combines structured root-owned statuses with Pi footer data, using semantic glyphs, theme color slots, compact separators, and width-aware priority clipping. Shared terminal UI primitives auto-select Nerd Font glyphs or ASCII fallback, with `PI_EXTENSIONS_ICON_MODE=nerd|ascii|auto` available for explicit control. Task Branches and Rewind publish status into this shared surface instead of writing independent footer strings. External extension statuses are filtered before display so context totals, idle markers, and steady-state transport summaries do not duplicate the footer's resource group.
 
 Task Branches provides `push-task`, `/tasks`, `/start-task`, `/discard-task`, `/finish-task`, `/abort-task`, and `/auto`. Its task-list panel uses the same shared terminal UI primitives as the root footer.
 
