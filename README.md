@@ -9,6 +9,7 @@ Package-owned extension source lives under `extensions/`. Remaining submodules a
 | Directory | Runtime/integration path | Upstream | Fork | Default |
 |---|---|---|---|---|
 | `extensions/pi-tool-display` | `extensions/pi-tool-display` | `MasuRii/pi-tool-display` | package-owned integration | enabled |
+| `extensions/pi-supergsd` | `extensions/pi-supergsd` | `skhoroshavin/pi-supergsd` | package-owned integration | enabled |
 | `pi-mcp-adapter` | `pi-mcp-adapter` | `nicobailon/pi-mcp-adapter` | `ginwzy/pi-mcp-adapter` | enabled |
 | `ff-labs-pi-fff` | `ff-labs-pi-fff/packages/pi-fff` | `dmtrKovalenko/fff` | `ginwzy/fff` | enabled |
 | `juicesharp-rpiv-ask-user-question` | `packages/rpiv-ask-user-question`, `packages/rpiv-todo` | `juicesharp/rpiv-mono` | `ginwzy/rpiv-mono` | enabled |
@@ -19,11 +20,16 @@ Package-owned extension source lives under `extensions/`. Remaining submodules a
 
 `extensions/pi-tool-display` includes the fork commits for colored tool pills and the Pi 0.83 peer-runtime compatibility metadata from `ginwzy/pi-tool-display` commit `f9bad41f9d880497c36500dee5177c1ea3292ac0`.
 
+`extensions/pi-supergsd` was copied from `skhoroshavin/pi-supergsd` commit `69f0650f64e999cb093e8e554a2a5cc39905ca5e` so it can be modified as package-owned source.
+
 ## Root Package
 
 The root manifest exposes:
 
 - `extensions/pi-tool-display/index.ts`, package-owned Tool Display source.
+- `extensions/pi-supergsd/index.ts`, package-owned SuperGSD source.
+
+The root manifest also exposes SuperGSD skills from `extensions/pi-supergsd/skills`.
 
 Do not enable the root package alongside standalone packages that it owns. The installer writes the root package and the enabled standalone local package paths.
 
