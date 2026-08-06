@@ -19,11 +19,12 @@ npm_install() {
   fi
 }
 
-# Root package dependencies include bundled external packages.
+# Root package dependencies.
 npm_install "."
 
 # Standalone packages currently enabled in Pi.
 for dir in \
+  pi-mcp-adapter \
   pi-btw \
   pi-rewind
 do

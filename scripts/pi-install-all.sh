@@ -8,6 +8,7 @@ settings="${PI_SETTINGS_FILE:-$HOME/.pi/agent/settings.json}"
 
 packages=(
   "@ginwzy/pi-extensions|."
+  "pi-mcp-adapter|pi-mcp-adapter"
   "pi-rtk-optimizer|pi-rtk-optimizer"
   "@ff-labs/pi-fff|ff-labs-pi-fff/packages/pi-fff"
   "pi-simplify|pi-simplify/packages/pi-simplify"
@@ -42,6 +43,7 @@ const settingsPath = process.env.PI_SETTINGS_FILE;
 const settingsDir = path.dirname(settingsPath);
 const packagePaths = new Map([
   ["@ginwzy/pi-extensions", "."],
+  ["pi-mcp-adapter", "pi-mcp-adapter"],
   ["pi-rtk-optimizer", "pi-rtk-optimizer"],
   ["@ff-labs/pi-fff", "ff-labs-pi-fff/packages/pi-fff"],
   ["pi-simplify", "pi-simplify/packages/pi-simplify"],

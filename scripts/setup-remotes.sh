@@ -22,6 +22,7 @@ set_remote() {
 }
 
 set_remote pi-rtk-optimizer upstream https://github.com/MasuRii/pi-rtk-optimizer.git
+set_remote pi-mcp-adapter upstream https://github.com/nicobailon/pi-mcp-adapter.git
 set_remote ff-labs-pi-fff upstream https://github.com/dmtrKovalenko/fff.git
 set_remote juicesharp-rpiv-ask-user-question upstream https://github.com/juicesharp/rpiv-mono.git
 set_remote pi-simplify upstream https://github.com/MattDevy/pi-extensions.git

@@ -9,7 +9,7 @@ Package-owned extension source lives under `extensions/`. Remaining submodules a
 | Directory | Runtime/integration path | Upstream | Fork | Default |
 |---|---|---|---|---|
 | `extensions/pi-tool-display` | `extensions/pi-tool-display` | `MasuRii/pi-tool-display` | package-owned integration | enabled |
-| `node_modules/pi-mcp-adapter` | dependency-carried external package | `nicobailon/pi-mcp-adapter` | `ginwzy/pi-mcp-adapter` | enabled |
+| `pi-mcp-adapter` | `pi-mcp-adapter` | `nicobailon/pi-mcp-adapter` | `ginwzy/pi-mcp-adapter` | enabled |
 | `ff-labs-pi-fff` | `ff-labs-pi-fff/packages/pi-fff` | `dmtrKovalenko/fff` | `ginwzy/fff` | enabled |
 | `juicesharp-rpiv-ask-user-question` | `packages/rpiv-ask-user-question`, `packages/rpiv-todo` | `juicesharp/rpiv-mono` | `ginwzy/rpiv-mono` | enabled |
 | `pi-simplify` | `pi-simplify/packages/pi-simplify` | `MattDevy/pi-extensions` | `ginwzy/pi-extensions-1` | enabled |
@@ -24,9 +24,8 @@ Package-owned extension source lives under `extensions/`. Remaining submodules a
 The root manifest exposes:
 
 - `extensions/pi-tool-display/index.ts`, package-owned Tool Display source.
-- `node_modules/pi-mcp-adapter/index.ts`, a dependency-carried external extension.
 
-Do not enable the root package alongside standalone packages that it owns or carries. The installer keeps carried packages out of settings and writes the remaining enabled local package paths.
+Do not enable the root package alongside standalone packages that it owns. The installer writes the root package and the enabled standalone local package paths.
 
 ## Initial Setup
 
@@ -91,7 +90,7 @@ For this package:
 
 - `pi update --extensions` can update the root `@ginwzy/pi-extensions` package when installed from an unpinned npm or Git source.
 - Pinned npm versions and pinned Git refs are fixed; Pi reconciles pinned Git clones to the configured ref but does not advance them.
-- Dependencies carried by the root package are installed by npm as part of the root package install/update. Pi does not treat them as separately updateable Pi packages unless they also appear separately in settings.
+- Dependencies of standalone packages are installed by their own package installs. Pi updates them only when their package source appears in settings and is updateable.
 
 ## Notes
 
