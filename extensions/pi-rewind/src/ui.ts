@@ -1,33 +1,40 @@
 /**
  * pi-rewind — UI helpers
  *
- * Footer status and notifications.
+ * Aggregated footer status and notifications.
  */
 
 import type { ExtensionContext } from "@earendil-works/pi-coding-agent";
+import { clearRootStatus, setRootStatus } from "../../pi-footer/src/status-store.js";
 import type { RewindState } from "./state.js";
 
 const STATUS_KEY = "rewind";
 
-/** Update footer status with checkpoint count */
+/** Update aggregated footer status with checkpoint count */
 export function updateStatus(state: RewindState, ctx: ExtensionContext): void {
   if (!ctx.hasUI) return;
 
   if (!state.gitAvailable) {
-    ctx.ui.setStatus(STATUS_KEY, undefined);
+    clearRootStatus(STATUS_KEY);
     return;
   }
 
-  const theme = ctx.ui.theme;
   const count = state.checkpoints.size;
-  ctx.ui.setStatus(
-    STATUS_KEY,
-    theme.fg("dim", "◆ ") + theme.fg("muted", `${count} checkpoint${count === 1 ? "" : "s"}`),
-  );
+  if (count === 0) {
+    clearRootStatus(STATUS_KEY);
+    return;
+  }
+
+  setRootStatus(STATUS_KEY, {
+    label: "rewind",
+    state: "ok",
+    value: String(count),
+    priority: 65,
+  });
 }
 
 /** Clear status */
 export function clearStatus(ctx: ExtensionContext): void {
   if (!ctx.hasUI) return;
-  ctx.ui.setStatus(STATUS_KEY, undefined);
+  clearRootStatus(STATUS_KEY);
 }

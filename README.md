@@ -28,11 +28,14 @@ Package-owned extension source lives under `extensions/`. Remaining submodules a
 
 The root manifest exposes:
 
+- `extensions/pi-footer/index.ts`, package-owned footer/status aggregator.
 - `extensions/pi-tool-display/index.ts`, package-owned Tool Display source.
 - `extensions/pi-tasks/index.ts`, package-owned Task Branches source.
 - `extensions/pi-rewind/src/index.ts`, package-owned Rewind source.
 
-Task Branches provides `push-task`, `/tasks`, `/start-task`, `/discard-task`, `/finish-task`, `/abort-task`, and `/auto`.
+The root footer aggregator owns the package's status surface. It renders a custom Pi footer from structured root-owned statuses plus Pi footer data, using semantic glyphs, theme color slots, compact separators, and width-aware priority clipping. Shared terminal UI primitives auto-select Nerd Font glyphs or ASCII fallback, with `PI_EXTENSIONS_ICON_MODE=nerd|ascii|auto` available for explicit control. Task Branches and Rewind publish status into this shared surface instead of writing independent footer strings. External extension statuses are filtered before display so context totals, idle markers, and steady-state transport summaries do not duplicate the footer's resource group.
+
+Task Branches provides `push-task`, `/tasks`, `/start-task`, `/discard-task`, `/finish-task`, `/abort-task`, and `/auto`. Its task-list panel uses the same shared terminal UI primitives as the root footer.
 
 Rewind provides `/rewind`, `Esc Esc`, automatic checkpoints after mutating turns, and fork restore prompts. It intentionally does not prompt on normal session tree navigation so task branches can start and finish without file-restore interruption.
 

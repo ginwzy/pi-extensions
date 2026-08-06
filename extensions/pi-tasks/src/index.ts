@@ -19,6 +19,18 @@ import { Box, Text, type AutocompleteItem } from "@earendil-works/pi-tui";
 import { Type, type Static } from "typebox";
 
 import { renderTextContent, taskResultTextContent } from "./text-content.js";
+import { setRootStatus } from "../../pi-footer/src/status-store.js";
+import {
+  bold,
+  boxedLines,
+  clipLine,
+  dimSeparator,
+  fitLineByPriority,
+  RenderLines,
+  statusGlyph,
+  uiGlyphs,
+  type PaintTheme,
+} from "../../ui-style.js";
 
 export function toolPushTask(pi: PushTaskAPI): ToolDefinition {
   return defineTool({
@@ -143,6 +155,7 @@ export function cmdTasks(pi: TaskListAPI): CommandOptions {
     description: "List current and pending task branches",
     handler: async (_args: string, ctx: ExtensionCommandContext) => {
       await ctx.waitForIdle();
+      refreshTaskStatus(ctx);
       const details = buildTaskList(ctx.sessionManager);
       pi.sendMessage(
         {
@@ -256,9 +269,12 @@ export const rendererTaskList: MessageRenderer<TaskListDetails> = (
   theme,
 ): Box => {
   const details = isTaskListDetails(message.details) ? message.details : undefined;
-  const lines = details ? renderTaskListLines(details, theme) : [renderTextContent(message.content)];
   const box = new Box(1, 1, (text: string) => theme.bg("customMessageBg", text));
-  box.addChild(new Text(lines.join("\n"), 0, 0));
+  if (details) {
+    box.addChild(new RenderLines((width) => renderTaskListLines(details, theme, width)));
+  } else {
+    box.addChild(new Text(renderTextContent(message.content), 0, 0));
+  }
   return box;
 };
 
@@ -268,30 +284,39 @@ export function isTaskListMessage(message: { role: string; customType?: string }
 
 export function updateTaskStatus(
   session: ReadonlySessionLike,
-  setStatus: (key: string, value: string | undefined) => void,
-  theme: TaskStatusTheme,
   options: TaskStatusOptions = {},
 ): void {
   const prefix = options.prefix ?? "";
-  const pending = pendingTask(session);
-  if (pending) {
-    setStatus(
-      "task",
-      `${prefix}${theme.fg("dim", `pending task: ${taskTitle(pending.data.title)}`)}`,
-    );
-    return;
-  }
-
+  const pendingCount = pendingTasks(session).length;
   const active = currentTask(session);
+  const label = prefix ? `${prefix.trim()} task` : "task";
+
   if (active) {
-    setStatus(
-      "task",
-      `${prefix}${theme.fg("dim", `current task: ${taskTitle(active.data.title)}`)}`,
-    );
+    setRootStatus("task", {
+      label,
+      state: "active",
+      value: pendingCount > 0 ? `current + ${pendingCount} pending` : "current",
+      priority: 90,
+    });
     return;
   }
 
-  setStatus("task", undefined);
+  if (pendingCount > 0) {
+    setRootStatus("task", {
+      label,
+      state: "pending",
+      value: pendingCount === 1 ? "1 pending" : `${pendingCount} pending`,
+      priority: 80,
+    });
+    return;
+  }
+
+  setRootStatus("task", {
+    label,
+    state: "ok",
+    value: "idle",
+    priority: 75,
+  });
 }
 
 export function setSkills(s: Skill[]): void {
@@ -319,8 +344,6 @@ type TaskListAPI = Pick<ExtensionAPI, "sendMessage">;
 interface AutoCommandAPI extends TaskCommandAPI {
   on(eventName: "session_shutdown", handler: () => unknown): void;
 }
-
-type TaskStatusTheme = Pick<Theme, "fg">;
 
 type TaskStatusOptions = {
   prefix?: string;
@@ -541,11 +564,11 @@ type TaskActionResult = "cancelled" | void;
 
 function refreshTaskStatus(ctx: TaskStatusContext, options: TaskStatusOptions = {}): void {
   if (ctx.hasUI) {
-    updateTaskStatus(ctx.sessionManager, ctx.ui.setStatus.bind(ctx.ui), ctx.ui.theme, options);
+    updateTaskStatus(ctx.sessionManager, options);
   }
 }
 
-type TaskStatusContext = Pick<ExtensionCommandContext, "hasUI" | "sessionManager" | "ui">;
+type TaskStatusContext = Pick<ExtensionCommandContext, "hasUI" | "sessionManager">;
 
 function buildTaskList(session: ReadonlySessionLike): TaskListDetails {
   const pending = pendingTasks(session).map((task) => ({
@@ -582,26 +605,95 @@ function formatTaskListText(details: TaskListDetails): string {
   return lines.join("\n");
 }
 
-function renderTaskListLines(details: TaskListDetails, theme: Pick<Theme, "fg" | "bold">): string[] {
-  const lines = [theme.fg("customMessageLabel", theme.bold("Task Branches")), ""];
-  lines.push(theme.fg("muted", "Current"));
-  lines.push(`  ${details.current?.title ?? theme.fg("dim", "none")}`);
-  lines.push("");
-  lines.push(theme.fg("muted", "Pending"));
+function renderTaskListLines(details: TaskListDetails, theme: PaintTheme, width: number): string[] {
+  const pendingTotal = details.pending.length + details.hiddenPendingCount;
+  const header = fitLineByPriority(
+    [
+      {
+        text: `${theme.fg("customMessageLabel", uiGlyphs.marker)} ${theme.fg("customMessageLabel", bold(theme, "Task Branches"))}`,
+        priority: 100,
+        clippable: false,
+      },
+      {
+        text: details.current
+          ? `${theme.fg("warning", "current")} ${theme.fg("text", details.current.title)}`
+          : theme.fg("dim", "no current task"),
+        priority: 80,
+        minWidth: 10,
+      },
+      {
+        text: pendingTotal === 0
+          ? theme.fg("dim", "no pending")
+          : theme.fg("muted", `${pendingTotal} pending`),
+        priority: 70,
+        clippable: false,
+      },
+    ],
+    width,
+    theme,
+  );
+  const lines = [header];
+
+  if (details.current) {
+    lines.push(taskListRow({
+      glyph: statusGlyph(theme, "active"),
+      marker: uiGlyphs.selectMarker,
+      label: "current",
+      title: details.current.title,
+      theme,
+      width,
+    }));
+  }
 
   if (details.pending.length === 0) {
-    lines.push(`  ${theme.fg("dim", "none")}`);
+    lines.push(clipLine(`  ${statusGlyph(theme, "pending")} ${theme.fg("dim", "No pending task branches")}`, width, theme));
   } else {
     details.pending.forEach((task, index) => {
-      const suffix = task.promptLines === undefined ? "" : theme.fg("dim", `  ${task.promptLines} lines`);
-      lines.push(`  ${theme.fg("dim", `${index + 1}.`)} ${task.title}${suffix}`);
+      const suffix = task.promptLines === undefined
+        ? undefined
+        : `${task.promptLines} ${task.promptLines === 1 ? "line" : "lines"}`;
+      lines.push(taskListRow({
+        glyph: statusGlyph(theme, "pending"),
+        marker: " ",
+        label: `${index + 1}.`,
+        title: task.title,
+        suffix,
+        theme,
+        width,
+      }));
     });
     if (details.hiddenPendingCount > 0) {
-      lines.push(`  ${theme.fg("dim", `... ${details.hiddenPendingCount} more`)}`);
+      lines.push(clipLine(
+        `  ${theme.fg("dim", uiGlyphs.ellipsis)} ${theme.fg("dim", `${details.hiddenPendingCount} more`)}`,
+        width,
+        theme,
+      ));
     }
   }
 
-  return lines;
+  return boxedLines(lines, width, theme);
+}
+
+type TaskListRowOptions = {
+  glyph: string;
+  marker: string;
+  label: string;
+  title: string;
+  suffix?: string;
+  theme: PaintTheme;
+  width: number;
+};
+
+function taskListRow(options: TaskListRowOptions): string {
+  const segments = [
+    ` ${options.theme.fg("dim", options.marker)} ${options.glyph}`,
+    options.theme.fg("dim", options.label),
+    options.theme.fg("text", options.title),
+  ];
+  if (options.suffix) {
+    segments.push(options.theme.fg("dim", `${dimSeparator(options.theme)} ${options.suffix}`));
+  }
+  return clipLine(segments.join(" "), options.width, options.theme);
 }
 
 function promptLineCount(prompt: string): number {
