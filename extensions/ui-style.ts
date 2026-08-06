@@ -20,6 +20,8 @@ export interface UiGlyphs {
   emptyMark: string;
   model: string;
   git: string;
+  context: string;
+  provider: string;
   workspace: string;
   task: string;
   rewind: string;
@@ -49,6 +51,8 @@ const NERD_GLYPHS: UiGlyphs = {
   emptyMark: "○",
   model: "⚡",
   git: "",
+  context: "󰍛",
+  provider: "",
   workspace: "",
   task: "☰",
   rewind: "↺",
@@ -71,6 +75,8 @@ const ASCII_GLYPHS: UiGlyphs = {
   emptyMark: "o",
   model: "~",
   git: "git",
+  context: "ctx",
+  provider: "providers",
   workspace: "[]",
   task: "task",
   rewind: "rew",

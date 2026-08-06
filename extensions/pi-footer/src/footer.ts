@@ -185,7 +185,7 @@ function alignRight(left: string, right: string, width: number): string {
 function contextColor(pct: number): ThemeColor {
   if (pct >= 90) return "error";
   if (pct >= 70) return "warning";
-  return "accent";
+  return "success";
 }
 
 function contextCandidates(ctx: ExtensionContext, theme: PaintTheme): string[] {
@@ -196,10 +196,11 @@ function contextCandidates(ctx: ExtensionContext, theme: PaintTheme): string[] {
   const tokens = usage.contextWindow > 0
     ? `${theme.fg("dim", formatTokens(usage.tokens))}${theme.fg("dim", "/")}${theme.fg("dim", formatTokens(usage.contextWindow))}`
     : undefined;
+  const icon = theme.fg(contextColor(usage.percent), uiGlyphs.context);
   const candidates = [
-    `${renderBar(usage.percent, 8, theme)} ${pctText}${tokens ? ` ${dimSeparator(theme)} ${tokens}` : ""}`,
-    `${renderBar(usage.percent, 4, theme)} ${pctText}`,
-    `${theme.fg("dim", "ctx")} ${pctText}`,
+    `${icon} ${renderBar(usage.percent, 8, theme)} ${pctText}${tokens ? ` ${dimSeparator(theme)} ${tokens}` : ""}`,
+    `${icon} ${renderBar(usage.percent, 4, theme)} ${pctText}`,
+    `${icon} ${pctText}`,
     pctText,
   ];
   return [...new Set(candidates)];
@@ -210,15 +211,23 @@ function resourceCandidates(input: FooterRenderInput): string[] {
   const sep = ` ${dimSeparator(theme)} `;
   const contexts = contextCandidates(ctx, theme);
   const model = shortModel(ctx.model?.id);
-  const modelText = model ? `${theme.fg("accent", uiGlyphs.model)} ${theme.fg("accent", model)}` : undefined;
+  const thinking = ctx.thinkingLevel ?? "off";
+  const modelText = model
+    ? `${theme.fg("syntaxKeyword", uiGlyphs.model)}${theme.fg("accent", model)} ${theme.fg("dim", thinking)}`
+    : undefined;
   const branch = footerData.getGitBranch();
   const gitText = branch ? `${theme.fg("syntaxFunction", uiGlyphs.git)} ${theme.fg("syntaxFunction", branch)}` : undefined;
   const providerCount = footerData.getAvailableProviderCount();
-  const providerText = providerCount > 0 ? theme.fg("dim", `${providerCount}p`) : undefined;
+  const providerText = providerCount > 0
+    ? `${theme.fg("syntaxType", uiGlyphs.provider)} ${theme.fg("dim", String(providerCount))}`
+    : undefined;
 
   const candidates: string[] = [];
   const add = (...parts: Array<string | undefined>): void => {
-    const text = parts.filter((part): part is string => Boolean(part)).join(sep);
+    const text = parts
+      .filter((part): part is string => Boolean(part))
+      .reverse()
+      .join(sep);
     if (text && !candidates.includes(text)) candidates.push(text);
   };
 
@@ -262,18 +271,20 @@ export function renderRootFooter(input: FooterRenderInput): string[] {
     segments.push({ text: renderExternalStatus(status, theme), priority: status.priority, minWidth: 8 });
   }
 
+  const displaySegments = [...segments].reverse();
   const candidates = resourceCandidates(input);
   const separator = ` ${dimSeparator(theme)} `;
   for (const candidate of candidates) {
     const available = width - visibleWidth(candidate) - (candidate ? 1 : 0);
     if (available < 1) continue;
-    const left = fitLineByPriority(segments, available, theme, separator);
-    if (!left) continue;
-    const line = alignRight(left, candidate, width);
+    const right = fitLineByPriority(displaySegments, available, theme, separator);
+    if (!right) continue;
+    const line = alignRight(candidate, right, width);
     if (visibleWidth(line) <= width) return [line];
   }
 
-  return [clipLine(fitLineByPriority(segments, width, theme, separator), width, theme)];
+  const fallback = clipLine(fitLineByPriority(displaySegments, width, theme, separator), width, theme);
+  return [alignRight("", fallback, width)];
 }
 
 export function installRootFooter(ctx: ExtensionContext): void {
