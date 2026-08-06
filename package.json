@@ -13,14 +13,12 @@
     "url": "git+https://github.com/ginwzy/pi-extensions.git"
   },
   "files": [
-    "src",
     "extensions",
     "README.md",
     "THIRD_PARTY_NOTICES.md"
   ],
   "pi": {
     "extensions": [
-      "./src/index.ts",
       "./node_modules/pi-mcp-adapter/index.ts",
       "./extensions/pi-tool-display/index.ts"
     ],
@@ -31,9 +29,8 @@
     "themes": []
   },
   "scripts": {
-    "test": "vitest run",
     "typecheck": "tsc --noEmit",
-    "check": "npm run typecheck && npm test"
+    "check": "npm run typecheck"
   },
   "peerDependencies": {
     "@earendil-works/pi-coding-agent": "*",
@@ -46,7 +43,6 @@
     "@earendil-works/pi-coding-agent": "^0.83.0",
     "@types/node": "^24.10.0",
     "typescript": "^5.9.3",
-    "vitest": "^3.2.4",
     "@earendil-works/pi-tui": "^0.83.0"
   },
   "engines": {

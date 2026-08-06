@@ -19,8 +19,3 @@
 [submodule "pi-rewind"]
 	path = pi-rewind
 	url = https://github.com/ginwzy/pi-rewind.git
-
-[submodule "upstream-references/pi-gpt-fast-mode"]
-	path = upstream-references/pi-gpt-fast-mode
-	url = https://github.com/tunnckoCore/pi-gpt-fast-mode.git
-	branch = main

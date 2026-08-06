@@ -55,9 +55,8 @@ const localSources = new Map(
   [...packagePaths].map(([name, relativePath]) => [name, path.join(root, relativePath)]),
 );
 const rootPackageName = "@ginwzy/pi-extensions";
-const standaloneGptFastModeName = "@tunnckocore/pi-gpt-fast-mode";
 const removedPiRewindName = "@ayulab/pi-rewind";
-const recognizedNpmNames = new Set([...localSources.keys(), standaloneGptFastModeName, removedPiRewindName]);
+const recognizedNpmNames = new Set([...localSources.keys(), removedPiRewindName]);
 
 function sourceOf(entry) {
   return typeof entry === "string" ? entry : entry && typeof entry === "object" ? entry.source : undefined;
@@ -84,9 +83,6 @@ function localPackageName(source) {
 
 function gitPackageName(source) {
   const normalized = source.toLowerCase().replace(/^git\+/, "").replace(/#.*$/, "").replace(/\.git$/, "");
-  if (/[@:/]github\.com[/:]tunnckocore\/pi-gpt-fast-mode$/.test(normalized)) {
-    return standaloneGptFastModeName;
-  }
   if (/[@:/]github\.com[/:]ginwzy\/pi-extensions$/.test(normalized)) {
     return rootPackageName;
   }
@@ -103,27 +99,13 @@ function withSource(entry, source) {
   return typeof entry === "string" ? source : { ...entry, source };
 }
 
-function migrateStandaloneGptEntry(entry, source) {
-  if (typeof entry === "string") return source;
-  const { extensions, skills, prompts, themes, ...rest } = entry;
-  return { ...rest, source };
-}
-
 const settings = JSON.parse(fs.readFileSync(settingsPath, "utf8"));
 const current = Array.isArray(settings.packages) ? settings.packages : [];
-const hasRootEntry = current.some((entry) => packageName(entry) === rootPackageName);
 const seen = new Set();
 const next = [];
 
 for (const entry of current) {
   const name = packageName(entry);
-  if (name === standaloneGptFastModeName) {
-    if (!hasRootEntry && !seen.has(rootPackageName)) {
-      next.push(migrateStandaloneGptEntry(entry, localSources.get(rootPackageName)));
-      seen.add(rootPackageName);
-    }
-    continue;
-  }
   if (npmPackageName(sourceOf(entry)) === removedPiRewindName) {
     continue;
   }

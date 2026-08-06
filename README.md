@@ -2,13 +2,12 @@
 
 All-in-One [Pi](https://pi.dev) package maintained in this repository. The repository root is the package: `package.json` declares the Pi extension entries that should load from one install.
 
-Runtime source that has been folded into this package lives under `src/` or `extensions/`. Remaining submodules are standalone packages that are still installed separately until they are either migrated or removed.
+Package-owned extension source lives under `extensions/`. Remaining submodules are standalone packages that are still installed separately until they are either migrated or removed.
 
 ## Layout
 
 | Directory | Runtime/integration path | Upstream | Fork | Default |
 |---|---|---|---|---|
-| `upstream-references/pi-gpt-fast-mode` | `src/modules/gpt-fast-mode` | `tunnckoCore/pi-gpt-fast-mode` | package-owned integration | enabled |
 | `extensions/pi-tool-display` | `extensions/pi-tool-display` | `MasuRii/pi-tool-display` | package-owned integration | enabled |
 | `node_modules/pi-mcp-adapter` | dependency-carried external package | `nicobailon/pi-mcp-adapter` | `ginwzy/pi-mcp-adapter` | enabled |
 | `ff-labs-pi-fff` | `ff-labs-pi-fff/packages/pi-fff` | `dmtrKovalenko/fff` | `ginwzy/fff` | enabled |
@@ -20,17 +19,14 @@ Runtime source that has been folded into this package lives under `src/` or `ext
 
 `extensions/pi-tool-display` includes the fork commits for colored tool pills and the Pi 0.83 peer-runtime compatibility metadata from `ginwzy/pi-tool-display` commit `f9bad41f9d880497c36500dee5177c1ea3292ac0`.
 
-## All-in-One Package
+## Root Package
 
 The root manifest exposes:
 
-- `src/index.ts`, the All-in-One host extension.
 - `extensions/pi-tool-display/index.ts`, package-owned Tool Display source.
 - `node_modules/pi-mcp-adapter/index.ts`, a dependency-carried external extension.
 
-The host registers modules in deterministic order, rejects cross-module registration collisions, isolates module-level API overrides, and cleans up shared event-bus subscriptions at shutdown. GPT Fast Mode currently loads as a host module by default.
-
-Do not enable the root package alongside standalone packages that it owns or carries. The installer replaces standalone GPT Fast Mode with the root package, keeps carried packages out of settings, and writes the remaining enabled local package paths.
+Do not enable the root package alongside standalone packages that it owns or carries. The installer keeps carried packages out of settings and writes the remaining enabled local package paths.
 
 ## Initial Setup
 
@@ -57,7 +53,7 @@ Replace the managed npm/package entries in Pi settings with local paths:
 ./scripts/pi-install-all.sh
 ```
 
-The configuration script validates the root and every standalone package, backs up `~/.pi/agent/settings.json`, preserves package order and filters for existing managed packages, removes duplicate managed entries, replaces standalone GPT Fast Mode with the All-in-One root, and writes the remaining enabled local package paths.
+The configuration script validates the root and every standalone package, backs up `~/.pi/agent/settings.json`, preserves package order and filters for existing managed packages, removes duplicate managed entries, and writes the enabled local package paths.
 
 ## Daily Workflow
 
@@ -100,5 +96,5 @@ For this package:
 ## Notes
 
 - Sparse submodules have `ignore = dirty` configured because sparse-checkout makes unrelated upstream paths appear deleted in normal `git status`.
-- Migrated runtime source lives under `src/` and `extensions/`; submodules are not runtime dependencies for migrated source.
+- Package-owned runtime source lives under `extensions/`; submodules are not runtime dependencies for migrated source.
 - Run `/reload` or restart Pi after changing extension code or package sources.
