@@ -54,6 +54,7 @@ const packagePaths = new Map([
 const localSources = new Map(
   [...packagePaths].map(([name, relativePath]) => [name, path.join(root, relativePath)]),
 );
+localSources.set("@cortexkit/pi-magic-context", "npm:@cortexkit/pi-magic-context");
 const rootPackageName = "@ginwzy/pi-extensions";
 const removedAyuRewindName = "@ayulab/pi-rewind";
 const rootOwnedStandaloneNames = new Set(["pi-rewind"]);

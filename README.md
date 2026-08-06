@@ -17,6 +17,7 @@ Package-owned extension source lives under `extensions/`. Remaining submodules a
 | `pi-simplify` | `pi-simplify/packages/pi-simplify` | `MattDevy/pi-extensions` | `ginwzy/pi-extensions-1` | enabled |
 | `pi-btw` | `pi-btw` | `dbachelder/pi-btw` | `ginwzy/pi-btw` | enabled |
 | `pi-rtk-optimizer` | `pi-rtk-optimizer` | `MasuRii/pi-rtk-optimizer` | `ginwzy/pi-rtk-optimizer` | enabled |
+| `@cortexkit/pi-magic-context` | Pi-managed npm package | `cortexkit/magic-context` | upstream npm release | enabled |
 
 `extensions/pi-tool-display` includes the fork commits for colored tool pills and the Pi 0.83 peer-runtime compatibility metadata from `ginwzy/pi-tool-display` commit `f9bad41f9d880497c36500dee5177c1ea3292ac0`.
 
@@ -39,7 +40,9 @@ Task Branches provides `push-task`, `/tasks`, `/start-task`, `/discard-task`, `/
 
 Rewind provides `/rewind`, `Esc Esc`, automatic checkpoints after mutating turns, and fork restore prompts. It intentionally does not prompt on normal session tree navigation so task branches can start and finish without file-restore interruption.
 
-Do not enable the root package alongside standalone packages that it owns. The installer writes the root package and the enabled standalone local package paths.
+Do not enable the root package alongside standalone packages that it owns. The installer writes the root package, the enabled standalone local package paths, and the upstream Magic Context npm package.
+
+Magic Context owns context compaction and long-term memory. Its setup is intentionally kept in the upstream package rather than duplicated here; after first install, run `npx @cortexkit/magic-context@latest setup --harness pi` to select historian, dreamer, and sidekick models. Its shared configuration lives under `~/.config/cortexkit/` and project overrides live under `.cortexkit/`.
 
 ## Initial Setup
 
