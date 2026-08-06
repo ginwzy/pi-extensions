@@ -20,7 +20,7 @@ Package-owned extension source lives under `extensions/`. Remaining submodules a
 
 `extensions/pi-tool-display` includes the fork commits for colored tool pills and the Pi 0.83 peer-runtime compatibility metadata from `ginwzy/pi-tool-display` commit `f9bad41f9d880497c36500dee5177c1ea3292ac0`.
 
-`extensions/pi-supergsd` was copied from `skhoroshavin/pi-supergsd` commit `69f0650f64e999cb093e8e554a2a5cc39905ca5e` so it can be modified as package-owned source.
+`extensions/pi-supergsd` was copied from `skhoroshavin/pi-supergsd` commit `69f0650f64e999cb093e8e554a2a5cc39905ca5e` so its task-branch runtime can be modified as package-owned source.
 
 ## Root Package
 
@@ -29,7 +29,6 @@ The root manifest exposes:
 - `extensions/pi-tool-display/index.ts`, package-owned Tool Display source.
 - `extensions/pi-supergsd/index.ts`, package-owned SuperGSD source.
 
-The root manifest also exposes SuperGSD skills from `extensions/pi-supergsd/skills`.
 
 Do not enable the root package alongside standalone packages that it owns. The installer writes the root package and the enabled standalone local package paths.
 

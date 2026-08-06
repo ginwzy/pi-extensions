@@ -22,7 +22,7 @@
       "./extensions/pi-supergsd/index.ts"
     ],
     "skills": [
-      "./extensions/pi-supergsd/skills"
+      "!skills/**"
     ],
     "prompts": [],
     "themes": []

@@ -8,6 +8,5 @@
     "skipLibCheck": true,
     "types": ["node"]
   },
-  "include": ["extensions/**/*.ts"],
-  "exclude": ["extensions/**/skills/**/*.ts"]
+  "include": ["extensions/**/*.ts"]
 }
