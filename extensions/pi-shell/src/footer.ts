@@ -16,6 +16,8 @@ import {
   type PaintTheme,
   type PrioritizedSegment,
 } from "../../ui-style.js";
+import { loadShellConfig } from "./config-store.js";
+import type { FooterContextStyle, ShellConfig } from "./config.js";
 import { getRootStatuses, onRootStatusChange, type RootStatus, type RootStatusState } from "./status-store.js";
 
 const FOOTER_STATUS_KEYS = new Set(["task", "rewind"]);
@@ -39,7 +41,10 @@ interface FooterRenderInput {
   footerData: ReadonlyFooterDataProvider;
   theme: PaintTheme;
   width: number;
+  config: ShellConfig;
 }
+
+export type FooterRenderOptions = Omit<FooterRenderInput, "config"> & { config?: ShellConfig };
 
 function shortModel(id: string | undefined): string | undefined {
   if (!id) return undefined;
@@ -188,15 +193,18 @@ function contextColor(pct: number): ThemeColor {
   return "success";
 }
 
-function contextCandidates(ctx: ExtensionContext, theme: PaintTheme): string[] {
+function contextCandidates(ctx: ExtensionContext, theme: PaintTheme, style: FooterContextStyle): string[] {
+  if (style === "off") return [];
   const usage = ctx.getContextUsage();
   if (!usage || usage.percent === null || usage.tokens === null) return [];
   const pct = Math.max(0, Math.min(100, Math.round(usage.percent)));
   const pctText = theme.fg(contextColor(usage.percent), `${usage.percent >= 70 ? `${uiGlyphs.blocked} ` : ""}${pct}%`);
+  const icon = theme.fg(contextColor(usage.percent), uiGlyphs.context);
+  if (style === "percent") return [pctText];
+  if (style === "compact") return [`${icon} ${renderBar(usage.percent, 4, theme)} ${pctText}`];
   const tokens = usage.contextWindow > 0
     ? `${theme.fg("dim", formatTokens(usage.tokens))}${theme.fg("dim", "/")}${theme.fg("dim", formatTokens(usage.contextWindow))}`
     : undefined;
-  const icon = theme.fg(contextColor(usage.percent), uiGlyphs.context);
   const candidates = [
     `${icon} ${renderBar(usage.percent, 8, theme)} ${pctText}${tokens ? ` ${dimSeparator(theme)} ${tokens}` : ""}`,
     `${icon} ${renderBar(usage.percent, 4, theme)} ${pctText}`,
@@ -207,17 +215,17 @@ function contextCandidates(ctx: ExtensionContext, theme: PaintTheme): string[] {
 }
 
 function resourceCandidates(input: FooterRenderInput): string[] {
-  const { ctx, footerData, theme } = input;
+  const { ctx, footerData, theme, config } = input;
   const sep = ` ${dimSeparator(theme)} `;
-  const contexts = contextCandidates(ctx, theme);
-  const model = shortModel(ctx.model?.id);
+  const contexts = contextCandidates(ctx, theme, config.footerContextStyle);
+  const model = config.footerShowModel ? shortModel(ctx.model?.id) : undefined;
   const thinking = ctx.thinkingLevel ?? "off";
   const modelText = model
     ? `${theme.fg("syntaxKeyword", uiGlyphs.model)}${theme.fg("accent", model)} ${theme.fg("dim", thinking)}`
     : undefined;
-  const branch = footerData.getGitBranch();
+  const branch = config.footerShowGit ? footerData.getGitBranch() : undefined;
   const gitText = branch ? `${theme.fg("syntaxFunction", uiGlyphs.git)} ${theme.fg("syntaxFunction", branch)}` : undefined;
-  const providerCount = footerData.getAvailableProviderCount();
+  const providerCount = config.footerShowProviders ? footerData.getAvailableProviderCount() : 0;
   const providerText = providerCount > 0
     ? `${theme.fg("syntaxType", uiGlyphs.provider)} ${theme.fg("dim", String(providerCount))}`
     : undefined;
@@ -246,7 +254,8 @@ function resourceCandidates(input: FooterRenderInput): string[] {
   return candidates;
 }
 
-export function renderRootFooter(input: FooterRenderInput): string[] {
+export function renderRootFooter(options: FooterRenderOptions): string[] {
+  const input: FooterRenderInput = { ...options, config: options.config ?? loadShellConfig() };
   const width = Math.max(1, input.width);
   const theme = input.theme;
   const external = collectExternalStatuses(input.footerData.getExtensionStatuses());

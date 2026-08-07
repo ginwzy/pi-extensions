@@ -28,6 +28,7 @@ export interface InspectorSettingItem {
 }
 
 export interface SplitPaneInspectorModalOptions {
+	title?: string;
 	getSettings: () => readonly InspectorSettingItem[];
 	onChange: (id: string, value: string) => void;
 	onClose: () => void;
@@ -240,8 +241,9 @@ export class SplitPaneInspectorModal implements ZellijModalContentRenderer {
 
 	private buildHeaderRow(width: number): string {
 		const searchBox = this.buildSearchBox(width);
-		const leftText = this.theme.fg("accent", this.theme.bold("Pi Tool Display Settings"));
-		const leftWidth = visibleWidth("Pi Tool Display Settings");
+		const title = this.options.title ?? "Pi Settings";
+		const leftText = this.theme.fg("accent", this.theme.bold(title));
+		const leftWidth = visibleWidth(title);
 		const searchWidth = visibleWidth(searchBox);
 		const gap = Math.max(1, width - leftWidth - searchWidth);
 		if (gap <= 1) {

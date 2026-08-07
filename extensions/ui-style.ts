@@ -116,7 +116,23 @@ export function resolveGlyphs(mode: IconMode = "auto"): UiGlyphs {
   return resolveIconMode(mode) === "nerd" ? NERD_GLYPHS : ASCII_GLYPHS;
 }
 
-export const uiGlyphs = resolveGlyphs("auto");
+let configuredIconMode: IconMode = "auto";
+
+export let uiGlyphs = resolveGlyphs("auto");
+
+/**
+ * Switches the shared glyph set at runtime. All consumers read `uiGlyphs`
+ * through live ESM bindings, so the new glyphs take effect on the next render.
+ * The PI_EXTENSIONS_ICON_MODE environment variable still takes precedence.
+ */
+export function configureUiGlyphs(mode: IconMode = "auto"): void {
+  configuredIconMode = mode;
+  uiGlyphs = resolveGlyphs(mode);
+}
+
+export function getConfiguredIconMode(): IconMode {
+  return configuredIconMode;
+}
 
 export interface PrioritizedSegment {
   text: string;

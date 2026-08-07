@@ -1,5 +1,5 @@
-// Vendored from ../zellij-modal/index.ts to keep pi-tool-display standalone.
-// Keep this module in sync when upstream zellij-modal primitives change.
+// Shared modal primitives (vendored from the zellij-modal extension).
+// Used by extension settings panels under extensions/.
 import { getSettingsListTheme, type ExtensionAPI, type Theme } from "@earendil-works/pi-coding-agent";
 import {
 	Box,

@@ -37,6 +37,23 @@ describe("renderShellHeader", () => {
     assert.ok((final.match(/█/g)?.length ?? 0) > (first.match(/█/g)?.length ?? 0));
   });
 
+  it("omits the workspace path when showPath is false", () => {
+    const withPath = renderShellHeader({ cwd: "/work/pi-extensions", frame: 5, theme, width: 80 }).join("\n");
+    const withoutPath = renderShellHeader({ cwd: "/work/pi-extensions", frame: 5, theme, width: 80, showPath: false }).join("\n");
+
+    assert.match(withPath, /\/work\/pi-extensions|~\/pi-extensions/);
+    assert.doesNotMatch(withoutPath, /\/work\/pi-extensions|~\/pi-extensions/);
+    assert.match(withoutPath, /workspace ready/);
+  });
+
+  it("omits the path segment in compact mode when showPath is false", () => {
+    const withPath = renderShellHeader({ cwd: "/work/pi-extensions", frame: 5, theme, width: 51 }).join("\n");
+    const withoutPath = renderShellHeader({ cwd: "/work/pi-extensions", frame: 5, theme, width: 51, showPath: false }).join("\n");
+
+    assert.match(withPath, /\/work|~\//);
+    assert.doesNotMatch(withoutPath, /\/work|~\//);
+  });
+
   it("collapses to one clipped line on narrow terminals", () => {
     for (const width of [40, 20, 8, 1]) {
       const lines = renderShellHeader({

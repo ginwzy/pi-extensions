@@ -38,6 +38,7 @@ export interface HeaderRenderInput {
   theme: PaintTheme;
   version?: string;
   width: number;
+  showPath?: boolean;
 }
 
 export function formatWorkspacePath(cwd: string): string {
@@ -75,12 +76,14 @@ function renderCompactHeader(input: HeaderRenderInput): string[] {
       priority: 70,
       minWidth: 8,
     },
-    {
+  ];
+  if (input.showPath !== false) {
+    segments.push({
       text: theme.fg("muted", formatWorkspacePath(cwd)),
       priority: 20,
       minWidth: 8,
-    },
-  ];
+    });
+  }
   const separator = ` ${dimSeparator(theme)} `;
   const line = fitLineByPriority(segments, Math.max(1, width), theme, separator);
   const fallback = bold(theme, theme.fg("accent", "Pi"));
@@ -97,9 +100,11 @@ export function renderShellHeader(input: HeaderRenderInput): string[] {
     `${bold(input.theme, input.theme.fg("accent", "Pi"))} ${input.theme.fg("dim", `v${input.version ?? VERSION}`)}`,
     "",
     bold(input.theme, input.theme.fg("text", workspace)),
-    `${input.theme.fg("syntaxType", uiGlyphs.workspace)} ${input.theme.fg("muted", formatWorkspacePath(input.cwd))}`,
-    input.theme.fg("dim", "workspace ready"),
   ];
+  if (input.showPath !== false) {
+    info.push(`${input.theme.fg("syntaxType", uiGlyphs.workspace)} ${input.theme.fg("muted", formatWorkspacePath(input.cwd))}`);
+  }
+  info.push(input.theme.fg("dim", "workspace ready"));
 
   return logo.map((line, index) => joinColumns(line.padEnd(LOGO_WIDTH), info[index] ?? "", width, input.theme));
 }
@@ -114,6 +119,7 @@ export class ShellHeader implements Component {
     private readonly tui: TUI,
     private readonly theme: Theme,
     animate: boolean,
+    private readonly showPath: boolean = true,
   ) {
     this.frame = animate ? 0 : FINAL_FRAME;
     if (animate) this.scheduleFrame();
@@ -136,6 +142,7 @@ export class ShellHeader implements Component {
       frame: this.frame,
       theme: this.theme,
       width,
+      showPath: this.showPath,
     });
   }
 
@@ -148,7 +155,7 @@ export class ShellHeader implements Component {
   }
 }
 
-export function installShellHeader(ctx: ExtensionContext, animate: boolean): void {
+export function installShellHeader(ctx: ExtensionContext, animate: boolean, showPath = true): void {
   if (!ctx.hasUI || ctx.mode !== "tui") return;
-  ctx.ui.setHeader((tui: TUI, theme: Theme) => new ShellHeader(ctx, tui, theme, animate));
+  ctx.ui.setHeader((tui: TUI, theme: Theme) => new ShellHeader(ctx, tui, theme, animate, showPath));
 }

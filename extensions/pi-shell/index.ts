@@ -1,11 +1,18 @@
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
-import { installRootFooter } from "./src/footer.js";
+import { registerShellCommand } from "./src/config-modal.js";
+import { applyShellConfig, loadShellConfig } from "./src/config-store.js";
 import { installShellHeader } from "./src/header.js";
+import { installRootFooter } from "./src/footer.js";
 import { clearRootStatuses } from "./src/status-store.js";
 
 export default function register(pi: ExtensionAPI): void {
+  registerShellCommand(pi);
+
   pi.on("session_start", async (event, ctx) => {
-    installShellHeader(ctx, event.reason === "startup" || event.reason === "new");
+    const config = loadShellConfig();
+    applyShellConfig(config);
+    const animate = event.reason === "startup" || event.reason === "new";
+    if (config.headerEnabled) installShellHeader(ctx, animate && config.headerAnimate, config.headerShowPath);
     installRootFooter(ctx);
   });
 

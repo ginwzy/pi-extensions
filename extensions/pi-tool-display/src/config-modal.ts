@@ -9,7 +9,7 @@ import {
 	type ToolDisplayPreset,
 } from "./presets.js";
 import { shortenPath } from "./render-utils.js";
-import type { InspectorSettingItem } from "./settings-inspector-modal.js";
+import type { InspectorSettingItem } from "../../settings-inspector-modal.js";
 import { type ToolDisplayConfig } from "./types.js";
 
 interface ToolDisplayConfigController {
@@ -406,14 +406,15 @@ export async function openSettingsModal(ctx: ExtensionCommandContext, controller
 	const capabilities = controller.getCapabilities();
 
 	const [{ ZellijModal }, { SplitPaneInspectorModal }] = await Promise.all([
-		import("./zellij-modal.js"),
-		import("./settings-inspector-modal.js"),
+		import("../../zellij-modal.js"),
+		import("../../settings-inspector-modal.js"),
 	]);
 
 	await ctx.ui.custom<void>(
 		(tui, theme, _keybindings, done) => {
 			const inspector = new SplitPaneInspectorModal(
 				{
+					title: "Pi Tool Display Settings",
 					getSettings: () => buildInspectorSettings(controller.getConfig(), capabilities),
 					onChange: (id, newValue) => {
 						const next = applySetting(controller.getConfig(), id, newValue);
