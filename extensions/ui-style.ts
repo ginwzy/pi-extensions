@@ -116,8 +116,6 @@ export function resolveGlyphs(mode: IconMode = "auto"): UiGlyphs {
   return resolveIconMode(mode) === "nerd" ? NERD_GLYPHS : ASCII_GLYPHS;
 }
 
-let configuredIconMode: IconMode = "auto";
-
 export let uiGlyphs = resolveGlyphs("auto");
 
 /**
@@ -126,12 +124,7 @@ export let uiGlyphs = resolveGlyphs("auto");
  * The PI_EXTENSIONS_ICON_MODE environment variable still takes precedence.
  */
 export function configureUiGlyphs(mode: IconMode = "auto"): void {
-  configuredIconMode = mode;
   uiGlyphs = resolveGlyphs(mode);
-}
-
-export function getConfiguredIconMode(): IconMode {
-  return configuredIconMode;
 }
 
 export interface PrioritizedSegment {

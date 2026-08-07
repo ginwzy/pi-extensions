@@ -2,7 +2,7 @@ import { existsSync, mkdirSync, readFileSync, renameSync, statSync, unlinkSync, 
 import { homedir } from "node:os";
 import { dirname, join } from "node:path";
 import { configureUiGlyphs } from "../../ui-style.js";
-import { DEFAULT_SHELL_CONFIG, FOOTER_CONTEXT_STYLES, ICON_MODES, type FooterContextStyle, type ShellConfig } from "./config.js";
+import { DEFAULT_SHELL_CONFIG, FOOTER_CONTEXT_STYLES, ICON_MODES, type ShellConfig } from "./config.js";
 
 const PI_AGENT_DIR_ENV_VAR = "PI_CODING_AGENT_DIR";
 
@@ -26,9 +26,9 @@ function toIconMode(value: unknown): ShellConfig["icons"] {
   return ICON_MODES.includes(value as ShellConfig["icons"]) ? (value as ShellConfig["icons"]) : DEFAULT_SHELL_CONFIG.icons;
 }
 
-function toContextStyle(value: unknown): FooterContextStyle {
-  return FOOTER_CONTEXT_STYLES.includes(value as FooterContextStyle)
-    ? (value as FooterContextStyle)
+function toContextStyle(value: unknown): ShellConfig["footerContextStyle"] {
+  return FOOTER_CONTEXT_STYLES.includes(value as ShellConfig["footerContextStyle"])
+    ? (value as ShellConfig["footerContextStyle"])
     : DEFAULT_SHELL_CONFIG.footerContextStyle;
 }
 

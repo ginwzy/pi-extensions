@@ -1,5 +1,5 @@
 import type { ExtensionAPI, ExtensionCommandContext, ExtensionContext } from "@earendil-works/pi-coding-agent";
-import { ICON_MODES, FOOTER_CONTEXT_STYLES, DEFAULT_SHELL_CONFIG, type ShellConfig } from "./config.js";
+import { DEFAULT_SHELL_CONFIG, FOOTER_CONTEXT_STYLES, ICON_MODES, type ShellConfig } from "./config.js";
 import { applyShellConfig, getShellConfigPath, loadShellConfig, saveShellConfig } from "./config-store.js";
 import { installShellHeader } from "./header.js";
 import type { InspectorSettingItem } from "../../settings-inspector-modal.js";
