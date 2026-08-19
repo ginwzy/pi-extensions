@@ -254,7 +254,7 @@ function buildInspectorSettings(
 			values: ["auto", "split", "unified"],
 			inspectorTitle: "Edit Diff Layout",
 			inspectorSummary: [
-				"Controls how edit and write diffs are arranged when the extension renders code changes.",
+				"Controls how edit, write, and apply_patch diffs are arranged when the extension renders code changes.",
 				"Auto mode adapts to terminal width so wide panes get side-by-side diffs while narrow panes stay readable.",
 			],
 			inspectorOptions: [
@@ -266,7 +266,7 @@ function buildInspectorSettings(
 				"Manual JSON tuning exposes diffSplitMinWidth, diffCollapsedLines, diffIndicatorMode, and diffWordWrap for more aggressive diff control.",
 			]),
 			inspectorPath: configPath,
-			searchTerms: ["diff", "edit", "write", "split", "unified", "auto"],
+			searchTerms: ["diff", "edit", "write", "apply_patch", "split", "unified", "auto"],
 		},
 		{
 			id: "diffIndicatorMode",

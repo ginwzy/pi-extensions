@@ -25,6 +25,11 @@ for spec in "${packages[@]}"; do
   fi
 done
 
+if [ ! -f "$root/pi-apply-patch/package.json" ]; then
+  echo "missing pi-apply-patch/package.json; initialize submodules first" >&2
+  exit 1
+fi
+
 if [ ! -f "$settings" ]; then
   echo "missing Pi settings: $settings" >&2
   exit 1
@@ -57,7 +62,7 @@ const localSources = new Map(
 localSources.set("@cortexkit/pi-magic-context", "npm:@cortexkit/pi-magic-context");
 const rootPackageName = "@ginwzy/pi-extensions";
 const removedAyuRewindName = "@ayulab/pi-rewind";
-const rootOwnedStandaloneNames = new Set(["pi-rewind"]);
+const rootOwnedStandaloneNames = new Set(["pi-rewind", "pi-apply-patch"]);
 const recognizedNpmNames = new Set([
   ...localSources.keys(),
   removedAyuRewindName,
@@ -97,6 +102,9 @@ function gitPackageName(source) {
   }
   if (/[@:/]github\.com[/:](arpagon|ginwzy)\/pi-rewind$/.test(normalized)) {
     return "pi-rewind";
+  }
+  if (/[@:/]github\.com[/:]code-yeongyu\/pi-apply-patch$/.test(normalized)) {
+    return "pi-apply-patch";
   }
   return undefined;
 }

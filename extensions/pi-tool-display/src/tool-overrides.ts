@@ -66,6 +66,7 @@ import {
   getWriteContentSizeBytes,
   shouldRenderWriteCallSummary,
 } from "./write-display-utils.js";
+import { isApplyPatchTool, renderApplyPatchResult } from "./apply-patch-display.js";
 
 interface BuiltInTools {
   read: ReturnType<typeof createReadTool>;
@@ -180,6 +181,34 @@ export interface ToolDisplayApi {
   decorateTool<T extends RuntimeToolDefinition>(tool: T, adapter?: ToolDisplayAdapter): T;
   registerAdapter(adapter: ToolDisplayAdapter): string;
   unregisterAdapter(id: string): boolean;
+}
+
+export function decorateApplyPatchToolForRegistration<T extends object>(tool: T): T {
+  if (!isApplyPatchTool(tool)) {
+    return tool;
+  }
+
+  const api = (globalThis as GlobalWithToolDisplayApi)[TOOL_DISPLAY_API_KEY];
+  if (!api) {
+    return tool;
+  }
+
+  const runtimeTool = tool as T & RuntimeToolDefinition;
+  const originalRenderResult = runtimeTool.renderResult;
+  const decorated = api.decorateTool(runtimeTool);
+  const displayRenderResult = decorated.renderResult;
+  if (displayRenderResult && displayRenderResult !== originalRenderResult) {
+    decorated.renderResult = (result, options, theme, context) => {
+      const rendered = displayRenderResult.call(decorated, result, options, theme, context);
+      if (rendered !== undefined && rendered !== null) {
+        return rendered;
+      }
+      return originalRenderResult?.call(runtimeTool, result, options, theme, context);
+    };
+  }
+
+  Object.assign(runtimeTool, decorated);
+  return tool;
 }
 
 interface PendingToolDisplayDecoration {
@@ -1585,7 +1614,22 @@ export function registerToolDisplayOverrides(
 ): void {
   clearBuiltInToolCache();
   const toolDisplayApi = installToolDisplayApi(getConfig);
+  const applyPatchAdapterId = toolDisplayApi.registerAdapter({
+    id: "apply-patch",
+    toolName: "apply_patch",
+    kind: "generic",
+    overrideExistingRenderers: true,
+    renderResult(result, options, theme) {
+      return renderApplyPatchResult(
+        result as ToolRenderInput,
+        options,
+        getConfig(),
+        theme,
+      );
+    },
+  });
   registerCleanup(() => {
+    toolDisplayApi.unregisterAdapter(applyPatchAdapterId);
     restoreToolPropertyDescriptors(decoratedToolDescriptors, decoratedTools);
     const globalWithApi = globalThis as GlobalWithToolDisplayApi;
     if (globalWithApi[TOOL_DISPLAY_API_KEY] === toolDisplayApi) {
@@ -2037,7 +2081,7 @@ export function registerToolDisplayOverrides(
     wrappedMcpToolNames.add(toolName);
   };
 
-  const installMcpRegistrationInterceptor = (): void => {
+  const installToolRegistrationInterceptor = (): void => {
     const piWithInterception = pi as PiWithRegisterToolInterception;
     const existingInterception = piWithInterception[TOOL_DISPLAY_REGISTER_TOOL_INTERCEPTOR_KEY];
     if (existingInterception && pi.registerTool === existingInterception.wrapped) {
@@ -2046,7 +2090,7 @@ export function registerToolDisplayOverrides(
     }
 
     const originalRegisterTool = pi.registerTool;
-    const wrappedRegisterTool = function registerToolWithMcpDecoration(
+    const wrappedRegisterTool = function registerToolWithDisplayDecoration(
       this: ExtensionAPI,
       tool: ToolDefinition,
     ): void {
@@ -2077,10 +2121,10 @@ export function registerToolDisplayOverrides(
     });
   };
 
-  installMcpRegistrationInterceptor();
+  installToolRegistrationInterceptor();
 
-  const registerMcpToolOverrides = (): void => {
-    const allTools = tryGetAllTools(pi, "MCP tool override discovery failed.");
+  const registerDynamicToolOverrides = (): void => {
+    const allTools = tryGetAllTools(pi, "Dynamic tool override discovery failed.");
     if (!allTools) {
       return;
     }
@@ -2092,33 +2136,33 @@ export function registerToolDisplayOverrides(
     }
   };
 
-  const mcpDiscoveryRetryTimers = new Set<ReturnType<typeof setTimeout> & { unref?: () => void }>();
+  const toolDiscoveryRetryTimers = new Set<ReturnType<typeof setTimeout> & { unref?: () => void }>();
   registerCleanup(() => {
-    for (const timer of mcpDiscoveryRetryTimers) {
+    for (const timer of toolDiscoveryRetryTimers) {
       clearTimeout(timer);
     }
-    mcpDiscoveryRetryTimers.clear();
+    toolDiscoveryRetryTimers.clear();
   });
 
-  const scheduleMcpToolOverrideDiscovery = (): void => {
+  const scheduleToolOverrideDiscovery = (): void => {
     for (const delayMs of [25, 75, 150, 300]) {
       const timer = setTimeout(() => {
-        mcpDiscoveryRetryTimers.delete(timer);
-        registerMcpToolOverrides();
+        toolDiscoveryRetryTimers.delete(timer);
+        registerDynamicToolOverrides();
       }, delayMs) as ReturnType<typeof setTimeout> & { unref?: () => void };
-      mcpDiscoveryRetryTimers.add(timer);
+      toolDiscoveryRetryTimers.add(timer);
       timer.unref?.();
     }
   };
 
   pi.on("session_start", async () => {
     clearWriteExecutionMeta(writeExecutionMetaByToolCallId);
-    registerMcpToolOverrides();
-    scheduleMcpToolOverrideDiscovery();
+    registerDynamicToolOverrides();
+    scheduleToolOverrideDiscovery();
   });
   pi.on("before_agent_start", async () => {
     clearWriteExecutionMeta(writeExecutionMetaByToolCallId);
-    registerMcpToolOverrides();
-    scheduleMcpToolOverrideDiscovery();
+    registerDynamicToolOverrides();
+    scheduleToolOverrideDiscovery();
   });
 }

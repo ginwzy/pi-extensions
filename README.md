@@ -2,7 +2,7 @@
 
 All-in-One [Pi](https://pi.dev) package maintained in this repository. The repository root is the package: `package.json` declares the Pi extension entries that should load from one install.
 
-Package-owned extension source lives under `extensions/`. Remaining submodules are standalone packages that are still installed separately until they are either migrated or removed.
+Package-owned extension source lives under `extensions/`. `pi-apply-patch` remains pinned upstream source consumed through a package-owned bridge; remaining submodules are standalone packages installed separately until they are either migrated or removed.
 
 ## Layout
 
@@ -12,6 +12,7 @@ Package-owned extension source lives under `extensions/`. Remaining submodules a
 | `extensions/pi-tasks` | `extensions/pi-tasks` | `skhoroshavin/pi-supergsd` | package-owned integration | enabled |
 | `extensions/pi-rewind` | `extensions/pi-rewind` | `arpagon/pi-rewind` | package-owned integration | enabled |
 | `pi-mcp-adapter` | `pi-mcp-adapter` | `nicobailon/pi-mcp-adapter` | `ginwzy/pi-mcp-adapter` | enabled |
+| `pi-apply-patch` | `pi-apply-patch` | `code-yeongyu/pi-apply-patch` | upstream source via root bridge | enabled |
 | `ff-labs-pi-fff` | `ff-labs-pi-fff/packages/pi-fff` | `dmtrKovalenko/fff` | `ginwzy/fff` | enabled |
 | `juicesharp-rpiv-ask-user-question` | `packages/rpiv-ask-user-question`, `packages/rpiv-todo` | `juicesharp/rpiv-mono` | `ginwzy/rpiv-mono` | enabled |
 | `pi-simplify` | `pi-simplify/packages/pi-simplify` | `MattDevy/pi-extensions` | `ginwzy/pi-extensions-1` | enabled |
@@ -33,6 +34,7 @@ The root manifest exposes:
 
 - `extensions/pi-shell/index.ts`, package-owned startup header and footer/status aggregator.
 - `extensions/pi-tool-display/index.ts`, package-owned Tool Display source.
+- `extensions/pi-apply-patch/index.ts`, bridge that decorates the pinned upstream patch tool before registration.
 - `extensions/pi-tasks/index.ts`, package-owned Task Branches source.
 - `extensions/pi-rewind/src/index.ts`, package-owned Rewind source.
 
@@ -43,6 +45,8 @@ Task Branches provides `push-task`, `/tasks`, `/start-task`, `/discard-task`, `/
 Rewind provides `/rewind`, `Esc Esc`, automatic checkpoints after mutating turns, and fork restore prompts. It intentionally does not prompt on normal session tree navigation so task branches can start and finish without file-restore interruption.
 
 Do not enable the root package alongside standalone packages that it owns. The installer writes the root package, the enabled standalone local package paths, and the upstream Magic Context npm package.
+
+`pi-apply-patch` activates for OpenAI GPT-family models and replaces the standard `write` and `edit` tools with the Codex-style `apply_patch` tool. Other models keep the standard tools. Its structured previews are rendered by `pi-tool-display`, so collapsed and expanded patch diffs follow the same layout and line-limit settings as `edit`.
 
 Magic Context owns context compaction and long-term memory. Its setup is intentionally kept in the upstream package rather than duplicated here; after first install, run `npx @cortexkit/magic-context@latest setup --harness pi` to select historian, dreamer, and sidekick models. Its shared configuration lives under `~/.config/cortexkit/` and project overrides live under `.cortexkit/`.
 
@@ -59,7 +63,7 @@ If the repo was already cloned without submodules:
 git submodule update --init --recursive
 ```
 
-Install dependencies for the root package and remaining standalone packages:
+Install dependencies for the root package, bridged upstream source, and remaining standalone packages:
 
 ```bash
 ./scripts/install-deps.sh
@@ -71,7 +75,7 @@ Replace the managed npm/package entries in Pi settings with local paths:
 ./scripts/pi-install-all.sh
 ```
 
-The configuration script validates the root and every standalone package, backs up `~/.pi/agent/settings.json`, preserves package order and filters for existing managed packages, removes duplicate managed entries, and writes the enabled local package paths.
+The configuration script validates the root, bridged source, and every standalone package; backs up `~/.pi/agent/settings.json`; preserves package order and filters for existing managed packages; removes duplicate managed entries; and writes the enabled local package paths.
 
 ## Daily Workflow
 
@@ -114,5 +118,5 @@ For this package:
 ## Notes
 
 - Sparse submodules have `ignore = dirty` configured because sparse-checkout makes unrelated upstream paths appear deleted in normal `git status`.
-- Package-owned runtime source lives under `extensions/`; submodules are not runtime dependencies for migrated source.
+- Package-owned runtime entry points live under `extensions/`; the `pi-apply-patch` bridge imports its pinned submodule source, while migrated extensions no longer depend on their former submodules at runtime.
 - Run `/reload` or restart Pi after changing extension code or package sources.
