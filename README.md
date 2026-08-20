@@ -19,6 +19,7 @@ Package-owned extension source lives under `extensions/`. `pi-apply-patch` remai
 | `pi-btw` | `pi-btw` | `dbachelder/pi-btw` | `ginwzy/pi-btw` | enabled |
 | `pi-rtk-optimizer` | `pi-rtk-optimizer` | `MasuRii/pi-rtk-optimizer` | `ginwzy/pi-rtk-optimizer` | enabled |
 | `@cortexkit/pi-magic-context` | Pi-managed npm package | `cortexkit/magic-context` | upstream npm release | enabled |
+| `pi-web-access` | Pi-managed npm package | `nicobailon/pi-web-access` | upstream npm release | enabled |
 
 `extensions/pi-tool-display` includes the fork commits for colored tool pills and the Pi 0.83 peer-runtime compatibility metadata from `ginwzy/pi-tool-display` commit `f9bad41f9d880497c36500dee5177c1ea3292ac0`.
 
@@ -44,7 +45,7 @@ Task Branches provides `push-task`, `/tasks`, `/start-task`, `/discard-task`, `/
 
 Rewind provides `/rewind`, `Esc Esc`, automatic checkpoints after mutating turns, and fork restore prompts. It intentionally does not prompt on normal session tree navigation so task branches can start and finish without file-restore interruption.
 
-Do not enable the root package alongside standalone packages that it owns. The installer writes the root package, the enabled standalone local package paths, and the upstream Magic Context npm package.
+Do not enable the root package alongside standalone packages that it owns. The installer writes the root package, the enabled standalone local package paths, and the upstream Magic Context and Web Access npm packages.
 
 `pi-apply-patch` activates for OpenAI GPT-family models and replaces the standard `write` and `edit` tools with the Codex-style `apply_patch` tool. Other models keep the standard tools. Its structured previews are rendered by `pi-tool-display`, so collapsed and expanded patch diffs follow the same layout and line-limit settings as `edit`.
 
