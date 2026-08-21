@@ -14,7 +14,6 @@ packages=(
   "pi-simplify|pi-simplify/packages/pi-simplify"
   "@juicesharp/rpiv-ask-user-question|juicesharp-rpiv-ask-user-question/packages/rpiv-ask-user-question"
   "pi-btw|pi-btw"
-  "@juicesharp/rpiv-todo|juicesharp-rpiv-ask-user-question/packages/rpiv-todo"
 )
 
 for spec in "${packages[@]}"; do
@@ -53,7 +52,6 @@ const packagePaths = new Map([
   ["pi-simplify", "pi-simplify/packages/pi-simplify"],
   ["@juicesharp/rpiv-ask-user-question", "juicesharp-rpiv-ask-user-question/packages/rpiv-ask-user-question"],
   ["pi-btw", "pi-btw"],
-  ["@juicesharp/rpiv-todo", "juicesharp-rpiv-ask-user-question/packages/rpiv-todo"],
 ]);
 
 const localSources = new Map(
@@ -63,10 +61,16 @@ localSources.set("@cortexkit/pi-magic-context", "npm:@cortexkit/pi-magic-context
 localSources.set("pi-web-access", "npm:pi-web-access");
 const rootPackageName = "@ginwzy/pi-extensions";
 const removedAyuRewindName = "@ayulab/pi-rewind";
+const removedRpivTodoName = "@juicesharp/rpiv-todo";
+const removedRpivTodoSource = path.join(
+  root,
+  "juicesharp-rpiv-ask-user-question/packages/rpiv-todo",
+);
 const rootOwnedStandaloneNames = new Set(["pi-rewind", "pi-apply-patch"]);
 const recognizedNpmNames = new Set([
   ...localSources.keys(),
   removedAyuRewindName,
+  removedRpivTodoName,
   ...rootOwnedStandaloneNames,
 ]);
 const rootOwnedStandaloneSources = new Set(
@@ -133,7 +137,17 @@ const next = [];
 for (const entry of current) {
   const source = sourceOf(entry);
   const name = packageName(entry);
-  if (npmPackageName(source) === removedAyuRewindName || rootOwnedStandaloneNames.has(name) || isRootOwnedStandaloneSource(source)) {
+  const isRemovedRpivTodo =
+    name === removedRpivTodoName ||
+    (typeof source === "string" &&
+      !/^(npm:|git:|https?:|ssh:|git:)/.test(source) &&
+      path.resolve(settingsDir, source) === removedRpivTodoSource);
+  if (
+    npmPackageName(source) === removedAyuRewindName ||
+    isRemovedRpivTodo ||
+    rootOwnedStandaloneNames.has(name) ||
+    isRootOwnedStandaloneSource(source)
+  ) {
     continue;
   }
   if (!localSources.has(name)) {
