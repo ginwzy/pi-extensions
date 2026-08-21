@@ -3,6 +3,10 @@ set -euo pipefail
 
 cd "$(dirname "$0")/.."
 
+if git -C juicesharp-rpiv-ask-user-question sparse-checkout list >/dev/null 2>&1; then
+  git -C juicesharp-rpiv-ask-user-question sparse-checkout add packages/rpiv-i18n
+fi
+
 npm_install() {
   local dir="$1"
   if [ ! -f "$dir/package.json" ]; then
@@ -33,7 +37,7 @@ done
 
 # Enabled packages contained in sparse monorepo submodules.
 for dir in \
-  ff-labs-pi-fff \
+  ff-labs-pi-fff/packages \
   juicesharp-rpiv-ask-user-question \
   pi-simplify
 do
