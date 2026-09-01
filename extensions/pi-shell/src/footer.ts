@@ -1,4 +1,5 @@
 import { stripVTControlCharacters } from "node:util";
+import { execFile } from "node:child_process";
 import type {
   ExtensionContext,
   ReadonlyFooterDataProvider,
@@ -42,9 +43,41 @@ interface FooterRenderInput {
   theme: PaintTheme;
   width: number;
   config: ShellConfig;
+  gitDiffStats?: GitDiffStats;
 }
 
 export type FooterRenderOptions = Omit<FooterRenderInput, "config"> & { config?: ShellConfig };
+
+export interface GitDiffStats {
+  added: number;
+  removed: number;
+}
+
+const GIT_DIFF_REFRESH_MS = 1_000;
+
+export function parseGitNumstat(output: string): GitDiffStats {
+  let added = 0;
+  let removed = 0;
+  for (const line of output.split("\n")) {
+    const [addedText, removedText] = line.split("\t", 3);
+    const fileAdded = Number.parseInt(addedText ?? "", 10);
+    const fileRemoved = Number.parseInt(removedText ?? "", 10);
+    if (Number.isFinite(fileAdded)) added += fileAdded;
+    if (Number.isFinite(fileRemoved)) removed += fileRemoved;
+  }
+  return { added, removed };
+}
+
+function readGitDiffStats(cwd: string): Promise<GitDiffStats | undefined> {
+  return new Promise((resolve) => {
+    execFile(
+      "git",
+      ["diff", "--numstat", "HEAD", "--"],
+      { cwd, encoding: "utf8", timeout: 2_000, maxBuffer: 4 * 1024 * 1024 },
+      (error, stdout) => resolve(error ? undefined : parseGitNumstat(stdout)),
+    );
+  });
+}
 
 function shortModel(id: string | undefined): string | undefined {
   if (!id) return undefined;
@@ -224,7 +257,10 @@ function resourceCandidates(input: FooterRenderInput): string[] {
     ? `${theme.fg("syntaxKeyword", uiGlyphs.model)}${theme.fg("accent", model)} ${theme.fg("dim", thinking)}`
     : undefined;
   const branch = config.footerShowGit ? footerData.getGitBranch() : undefined;
-  const gitText = branch ? `${theme.fg("syntaxFunction", uiGlyphs.git)} ${theme.fg("syntaxFunction", branch)}` : undefined;
+  const gitBranchText = branch ? `${theme.fg("syntaxFunction", uiGlyphs.git)} ${theme.fg("syntaxFunction", branch)}` : undefined;
+  const gitText = gitBranchText && input.gitDiffStats
+    ? `${gitBranchText} ${theme.fg("success", `+${input.gitDiffStats.added}`)} ${theme.fg("error", `-${input.gitDiffStats.removed}`)}`
+    : gitBranchText;
   const providerCount = config.footerShowProviders ? footerData.getAvailableProviderCount() : 0;
   const providerText = providerCount > 0
     ? `${theme.fg("syntaxType", uiGlyphs.provider)} ${theme.fg("dim", String(providerCount))}`
@@ -244,6 +280,7 @@ function resourceCandidates(input: FooterRenderInput): string[] {
   add(fullContext, modelText, gitText);
   add(compactContext, modelText, gitText);
   add(labelledContext, modelText, gitText);
+  add(labelledContext, modelText, gitBranchText);
   add(labelledContext, modelText);
   add(percentContext, modelText);
   add(modelText, gitText);
@@ -300,14 +337,39 @@ export function installRootFooter(ctx: ExtensionContext): void {
   if (!ctx.hasUI || ctx.mode !== "tui") return;
 
   ctx.ui.setFooter((tui: TUI, theme: Theme, footerData: ReadonlyFooterDataProvider): Component & { dispose(): void } => {
+    let gitDiffStats: GitDiffStats | undefined;
+    let lastGitRefresh = 0;
+    let refreshingGit = false;
+    let disposed = false;
+
+    const refreshGitDiff = (force = false): void => {
+      const now = Date.now();
+      if (refreshingGit || (!force && now - lastGitRefresh < GIT_DIFF_REFRESH_MS)) return;
+      refreshingGit = true;
+      lastGitRefresh = now;
+      void readGitDiffStats(ctx.cwd).then((nextStats) => {
+        refreshingGit = false;
+        if (disposed) return;
+        const changed = nextStats?.added !== gitDiffStats?.added || nextStats?.removed !== gitDiffStats?.removed;
+        gitDiffStats = nextStats;
+        if (changed) tui.requestRender();
+      });
+    };
+
     const unsubscribeRootStatus = onRootStatusChange(() => tui.requestRender());
-    const unsubscribeBranch = footerData.onBranchChange(() => tui.requestRender());
+    const unsubscribeBranch = footerData.onBranchChange(() => {
+      refreshGitDiff(true);
+      tui.requestRender();
+    });
+    refreshGitDiff(true);
     return {
       render(width: number): string[] {
-        return renderRootFooter({ ctx, footerData, theme, width });
+        refreshGitDiff();
+        return renderRootFooter({ ctx, footerData, theme, width, gitDiffStats });
       },
       invalidate(): void {},
       dispose(): void {
+        disposed = true;
         unsubscribeRootStatus();
         unsubscribeBranch();
       },
